@@ -400,6 +400,31 @@
       );
     }
 
+    function CompletionOverlay({ timerSeconds, visible }) {
+      const [opacity, setOpacity] = useState(0);
+
+      useEffect(() => {
+        if (!visible) { setOpacity(0); return; }
+        const showId = setTimeout(() => setOpacity(1), 50);
+        const hideId = setTimeout(() => setOpacity(0), 4000);
+        return () => { clearTimeout(showId); clearTimeout(hideId); };
+      }, [visible]);
+
+      if (!visible && opacity === 0) return null;
+
+      return (
+        <div
+          className="completion-overlay"
+          style={{ opacity, transition: 'opacity 0.5s ease' }}
+        >
+          <div className="completion-title">Solved!</div>
+          <div className="completion-time">{formatTime(timerSeconds)}</div>
+          <div className="completion-rule" />
+          <div className="completion-sub">Wednesday Mini · May 1, 2026</div>
+        </div>
+      );
+    }
+
     function RevealDialog({ onConfirm, onCancel }) {
       return (
         <div className="dialog-backdrop" onClick={onCancel}>
@@ -422,7 +447,7 @@
       const [direction, setDirection] = useState('across');
       const [timerSeconds, setTimerSeconds] = useState(0);
       const [timerStarted, setTimerStarted] = useState(false);
-      const [solved] = useState(false);
+      const [solved, setSolved] = useState(false);
       const [revealed, setRevealed] = useState(false);
       const [showRevealDialog, setShowRevealDialog] = useState(false);
 
@@ -462,6 +487,10 @@
             const newStates = cellStates.map(r => [...r]);
             newStates[row][col] = null;
             setCellStates(newStates);
+
+            if (checkSolved(newGrid, PUZZLE.solution)) {
+              setSolved(true);
+            }
 
             const wordCells = getWordCells(direction, row, col, PUZZLE.solution);
             const idx = wordCells.findIndex(c => c.row === row && c.col === col);
@@ -567,6 +596,7 @@
                   cellStates={cellStates}
                   onCellClick={handleCellClick}
                 />
+                <CompletionOverlay timerSeconds={timerSeconds} visible={solved} />
               </div>
               <Controls onCheck={handleCheck} onReveal={() => setShowRevealDialog(true)} solved={solved} revealed={revealed} />
             </div>
