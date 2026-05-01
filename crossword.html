@@ -400,6 +400,21 @@
       );
     }
 
+    function RevealDialog({ onConfirm, onCancel }) {
+      return (
+        <div className="dialog-backdrop" onClick={onCancel}>
+          <div className="dialog-card" onClick={e => e.stopPropagation()}>
+            <div className="dialog-title">Reveal Answers?</div>
+            <div className="dialog-body">This will fill in all answers and cannot be undone.</div>
+            <div className="dialog-buttons">
+              <button className="btn" onClick={onCancel}>Cancel</button>
+              <button className="btn btn-primary" onClick={onConfirm}>Reveal</button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     function App() {
       const [userGrid, setUserGrid] = useState(() => PUZZLE.solution.map(row => row.map(() => '')));
       const [cellStates, setCellStates] = useState(() => Array(5).fill(null).map(() => Array(5).fill(null)));
@@ -408,8 +423,8 @@
       const [timerSeconds, setTimerSeconds] = useState(0);
       const [timerStarted, setTimerStarted] = useState(false);
       const [solved] = useState(false);
-      const [revealed] = useState(false);
-      const [showRevealDialog] = useState(false);
+      const [revealed, setRevealed] = useState(false);
+      const [showRevealDialog, setShowRevealDialog] = useState(false);
 
       function handleCellClick(row, col) {
         if (PUZZLE.solution[row][col] === null) return;
@@ -516,6 +531,17 @@
         return clue ? { ...clue, direction } : null;
       }, [selectedCell, direction]);
 
+      function handleReveal() {
+        const fullGrid = PUZZLE.solution.map(row => row.map(cell => (cell === null ? '' : cell)));
+        setUserGrid(fullGrid);
+        const allCorrect = PUZZLE.solution.map(row =>
+          row.map(cell => (cell !== null ? 'correct' : null))
+        );
+        setCellStates(allCorrect);
+        setRevealed(true);
+        setShowRevealDialog(false);
+      }
+
       function handleCheck() {
         const newStates = PUZZLE.solution.map((row, r) =>
           row.map((cell, c) => {
@@ -542,7 +568,7 @@
                   onCellClick={handleCellClick}
                 />
               </div>
-              <Controls onCheck={handleCheck} onReveal={() => {}} solved={solved} revealed={revealed} />
+              <Controls onCheck={handleCheck} onReveal={() => setShowRevealDialog(true)} solved={solved} revealed={revealed} />
             </div>
             <ClueList
               clues={PUZZLE.clues}
@@ -550,6 +576,12 @@
               onClueClick={handleClueClick}
             />
           </div>
+          {showRevealDialog && (
+            <RevealDialog
+              onConfirm={handleReveal}
+              onCancel={() => setShowRevealDialog(false)}
+            />
+          )}
         </div>
       );
     }
