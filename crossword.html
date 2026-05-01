@@ -516,6 +516,17 @@
         return clue ? { ...clue, direction } : null;
       }, [selectedCell, direction]);
 
+      function handleCheck() {
+        const newStates = PUZZLE.solution.map((row, r) =>
+          row.map((cell, c) => {
+            if (cell === null) return null;
+            if (userGrid[r][c] === '') return null;
+            return userGrid[r][c] === cell ? 'correct' : 'wrong';
+          })
+        );
+        setCellStates(newStates);
+      }
+
       return (
         <div>
           <Header timerSeconds={timerSeconds} timerStarted={timerStarted} solved={solved} />
@@ -531,7 +542,7 @@
                   onCellClick={handleCellClick}
                 />
               </div>
-              <Controls onCheck={() => {}} onReveal={() => {}} solved={solved} revealed={revealed} />
+              <Controls onCheck={handleCheck} onReveal={() => {}} solved={solved} revealed={revealed} />
             </div>
             <ClueList
               clues={PUZZLE.clues}
