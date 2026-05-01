@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CrosswordSolver — Puzzle Editor</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #f5f0e8;
+      font-family: 'Libre Baskerville', Georgia, serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 16px 64px;
+      color: #1a1a1a;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 32px;
+      width: 100%;
+      max-width: 820px;
+      border-bottom: 2px solid #1a1a1a;
+      padding-bottom: 16px;
+    }
+    .header-eyebrow {
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #666;
+      margin-bottom: 8px;
+    }
+    .header-title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 38px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 6px;
+    }
+    .header-sub {
+      font-size: 13px;
+      color: #666;
+      font-style: italic;
+    }
+
+    .editor-layout {
+      display: flex;
+      gap: 48px;
+      width: 100%;
+      max-width: 820px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    /* GRID */
+    .grid-section { flex-shrink: 0; }
+    .grid-label {
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+    .grid-hint {
+      font-size: 12px;
+      color: #666;
+      font-style: italic;
+      margin-bottom: 12px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(5, 60px);
+      grid-template-rows: repeat(5, 60px);
+      border: 2px solid #1a1a1a;
+    }
+    .cell {
+      width: 60px; height: 60px;
+      border: 1px solid #1a1a1a;
+      background: #fff;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+      font-weight: 700;
+      cursor: pointer;
+      user-select: none;
+    }
+    .cell.black { background: #1a1a1a; }
+    .cell.selected { background: #d4a843; }
+    .cell-number {
+      position: absolute;
+      top: 3px; left: 3px;
+      font-size: 9px;
+      font-weight: 400;
+      font-family: 'Libre Baskerville', serif;
+      color: #1a1a1a;
+      line-height: 1;
+    }
+    .cell-input {
+      width: 100%; height: 100%;
+      border: none;
+      background: transparent;
+      text-align: center;
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+      font-weight: 700;
+      cursor: pointer;
+      color: #1a1a1a;
+      outline: none;
+      text-transform: uppercase;
+    }
+
+    .grid-controls { margin-top: 14px; display: flex; gap: 10px; align-items: center; }
+    .hint-text { font-size: 12px; color: #666; font-style: italic; }
+
+    /* CLUES */
+    .clues-section { flex: 1; min-width: 260px; }
+    .clue-group { margin-bottom: 24px; }
+    .clue-group-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      border-bottom: 1px solid #1a1a1a;
+      padding-bottom: 5px;
+      margin-bottom: 10px;
+    }
+    .clue-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .clue-num {
+      font-weight: 700;
+      flex-shrink: 0;
+      min-width: 22px;
+      font-size: 13px;
+    }
+    .clue-word {
+      font-family: 'Playfair Display', serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      flex-shrink: 0;
+      min-width: 70px;
+      color: #555;
+    }
+    .clue-input {
+      flex: 1;
+      border: none;
+      border-bottom: 1px solid #ccc;
+      background: transparent;
+      font-family: 'Libre Baskerville', serif;
+      font-size: 13px;
+      color: #1a1a1a;
+      padding: 2px 4px;
+      outline: none;
+    }
+    .clue-input:focus { border-bottom-color: #1a1a1a; }
+    .clue-input::placeholder { color: #bbb; font-style: italic; }
+
+    .no-words {
+      font-size: 13px;
+      color: #999;
+      font-style: italic;
+    }
+
+    /* EXPORT */
+    .export-section { margin-top: 28px; width: 100%; max-width: 820px; }
+    .export-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      border-bottom: 1px solid #1a1a1a;
+      padding-bottom: 5px;
+      margin-bottom: 12px;
+    }
+    .export-area {
+      width: 100%;
+      height: 160px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      border: 1.5px solid #1a1a1a;
+      background: #fff;
+      padding: 12px;
+      resize: none;
+      color: #1a1a1a;
+      outline: none;
+    }
+    .export-actions { display: flex; gap: 10px; margin-top: 10px; align-items: center; }
+    .copy-confirm { font-size: 12px; color: #555; font-style: italic; }
+
+    /* BUTTONS */
+    .btn {
+      padding: 8px 20px;
+      font-family: 'Libre Baskerville', serif;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border: 1.5px solid #1a1a1a;
+      background: transparent;
+      color: #1a1a1a;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+    .btn:hover { background: #1a1a1a; color: #f5f0e8; }
+    .btn.btn-primary { background: #1a1a1a; color: #f5f0e8; }
+    .btn.btn-primary:hover { background: #333; }
+
+    .back-link {
+      font-size: 12px;
+      color: #666;
+      text-decoration: none;
+      letter-spacing: 0.05em;
+    }
+    .back-link:hover { color: #1a1a1a; }
+
+    @media (max-width: 639px) {
+      .editor-layout { flex-direction: column; }
+      .header-title { font-size: 28px; }
+    }
+  </style>
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState, useMemo } = React;
+
+    // Same word-detection logic as the game
+    function getWordCells(direction, row, col, solution) {
+      if (solution[row][col] === null) return [];
+      const cells = [];
+      if (direction === 'across') {
+        let c = col;
+        while (c > 0 && solution[row][c - 1] !== null) c--;
+        while (c < 5 && solution[row][c] !== null) { cells.push({ row, col: c }); c++; }
+      } else {
+        let r = row;
+        while (r > 0 && solution[r - 1][col] !== null) r--;
+        while (r < 5 && solution[r][col] !== null) { cells.push({ row: r, col }); r++; }
+      }
+      return cells.length >= 2 ? cells : [];
+    }
+
+    function detectWords(solution) {
+      const across = [], down = [];
+      let number = 1;
+      const numbered = {};
+
+      for (let r = 0; r < 5; r++) {
+        for (let c = 0; c < 5; c++) {
+          if (solution[r][c] === null) continue;
+          const startsAcross = (c === 0 || solution[r][c-1] === null) && c < 4 && solution[r][c+1] !== null;
+          const startsDown   = (r === 0 || solution[r-1][c] === null) && r < 4 && solution[r+1][c] !== null;
+          if (startsAcross || startsDown) {
+            numbered[`${r},${c}`] = number;
+            if (startsAcross) {
+              const cells = getWordCells('across', r, c, solution);
+              across.push({ number, row: r, col: c, len: cells.length, clue: '', cells });
+            }
+            if (startsDown) {
+              const cells = getWordCells('down', r, c, solution);
+              down.push({ number, row: r, col: c, len: cells.length, clue: '', cells });
+            }
+            number++;
+          }
+        }
+      }
+      return { across, down, numbered };
+    }
+
+    function getWordLetters(cells, grid) {
+      return cells.map(({ row, col }) => grid[row][col] || '_').join('');
+    }
+
+    function buildExportJSON(solution, words, clues) {
+      const acrossClues = words.across.map(w => ({
+        number: w.number, row: w.row, col: w.col, len: w.len,
+        clue: clues[`across-${w.number}`] || '',
+      }));
+      const downClues = words.down.map(w => ({
+        number: w.number, row: w.row, col: w.col, len: w.len,
+        clue: clues[`down-${w.number}`] || '',
+      }));
+
+      const solutionStr = JSON.stringify(solution, null, 4)
+        .replace(/null/g, 'null')
+        .split('\n').map((l, i) => i === 0 ? l : '      ' + l).join('\n');
+
+      const acrossStr = acrossClues.map(c =>
+        `        { number:${c.number}, row:${c.row}, col:${c.col}, len:${c.len}, clue:${JSON.stringify(c.clue)} },`
+      ).join('\n');
+      const downStr = downClues.map(c =>
+        `        { number:${c.number}, row:${c.row}, col:${c.col}, len:${c.len}, clue:${JSON.stringify(c.clue)} },`
+      ).join('\n');
+
+      return `  {\n    solution: ${solutionStr},\n    clues: {\n      across: [\n${acrossStr}\n      ],\n      down: [\n${downStr}\n      ],\n    },\n  },`;
+    }
+
+    // ── COMPONENTS ───────────────────────────────────────────────
+
+    function EditorCell({ row, col, letter, isBlack, isSelected, number, onLeftClick, onRightClick, onChange }) {
+      if (isBlack) {
+        return (
+          <div className="cell black"
+            onClick={onLeftClick}
+            onContextMenu={e => { e.preventDefault(); onRightClick(); }}
+          />
+        );
+      }
+
+      let className = `cell${isSelected ? ' selected' : ''}`;
+      return (
+        <div className={className} onClick={onLeftClick} onContextMenu={e => { e.preventDefault(); onRightClick(); }}>
+          {number && <span className="cell-number">{number}</span>}
+          <input
+            className="cell-input"
+            value={letter}
+            maxLength={1}
+            onChange={e => onChange(e.target.value.toUpperCase().replace(/[^A-Z]/g, ''))}
+            onClick={e => e.stopPropagation()}
+          />
+        </div>
+      );
+    }
+
+    function App() {
+      const [grid, setGrid] = useState(() => Array(5).fill(null).map(() => Array(5).fill('')));
+      const [selectedCell, setSelectedCell] = useState(null);
+      const [clues, setClues] = useState({});
+      const [copyMsg, setCopyMsg] = useState('');
+
+      // Build solution array (null for black, letter/'' for white)
+      const solution = useMemo(() =>
+        grid.map(row => row.map(cell => cell === null ? null : (cell || ''))),
+        [grid]
+      );
+
+      const { across: acrossWords, down: downWords, numbered } = useMemo(() => detectWords(solution), [solution]);
+
+      function toggleBlack(r, c) {
+        const next = grid.map(row => [...row]);
+        next[r][c] = next[r][c] === null ? '' : null;
+        setGrid(next);
+      }
+
+      function setLetter(r, c, letter) {
+        const next = grid.map(row => [...row]);
+        next[r][c] = letter;
+        setGrid(next);
+      }
+
+      function handleCellClick(r, c) {
+        setSelectedCell(selectedCell && selectedCell.row === r && selectedCell.col === c ? null : { row: r, col: c });
+      }
+
+      function clearGrid() {
+        setGrid(Array(5).fill(null).map(() => Array(5).fill('')));
+        setClues({});
+      }
+
+      const exportJson = useMemo(() => {
+        // Combine solution: use actual letters where filled, empty string otherwise
+        const sol = grid.map(row => row.map(cell => {
+          if (cell === null) return null;
+          return cell || '';
+        }));
+        return buildExportJSON(sol, { across: acrossWords, down: downWords }, clues);
+      }, [grid, acrossWords, downWords, clues]);
+
+      function handleCopy() {
+        navigator.clipboard.writeText(exportJson).then(() => {
+          setCopyMsg('Copied to clipboard!');
+          setTimeout(() => setCopyMsg(''), 2500);
+        });
+      }
+
+      return (
+        <div>
+          <header className="header">
+            <div className="header-eyebrow">CrosswordSolver</div>
+            <h1 className="header-title">Puzzle Editor</h1>
+            <div className="header-sub">Design a puzzle, then paste the exported JSON into puzzles.js</div>
+          </header>
+
+          <div className="editor-layout">
+            <div className="grid-section">
+              <div className="grid-hint">Left-click a cell to select it. Right-click to toggle black.</div>
+              <div className="grid">
+                {grid.map((row, r) =>
+                  row.map((cell, c) => (
+                    <EditorCell
+                      key={`${r},${c}`}
+                      row={r} col={c}
+                      letter={cell === null ? '' : cell}
+                      isBlack={cell === null}
+                      isSelected={!!(selectedCell && selectedCell.row === r && selectedCell.col === c)}
+                      number={numbered[`${r},${c}`]}
+                      onLeftClick={() => cell !== null && handleCellClick(r, c)}
+                      onRightClick={() => toggleBlack(r, c)}
+                      onChange={letter => setLetter(r, c, letter)}
+                    />
+                  ))
+                )}
+              </div>
+              <div className="grid-controls">
+                <button className="btn" onClick={clearGrid}>Clear</button>
+                <span className="hint-text">Right-click cells to make them black</span>
+              </div>
+            </div>
+
+            <div className="clues-section">
+              {acrossWords.length === 0 && downWords.length === 0 ? (
+                <p className="no-words">Fill in the grid to see word entries here.</p>
+              ) : (
+                <>
+                  {acrossWords.length > 0 && (
+                    <div className="clue-group">
+                      <div className="clue-group-title">Across</div>
+                      {acrossWords.map(w => (
+                        <div className="clue-row" key={w.number}>
+                          <span className="clue-num">{w.number}</span>
+                          <span className="clue-word">{getWordLetters(w.cells, grid)}</span>
+                          <input
+                            className="clue-input"
+                            placeholder="Enter clue…"
+                            value={clues[`across-${w.number}`] || ''}
+                            onChange={e => setClues(prev => ({ ...prev, [`across-${w.number}`]: e.target.value }))}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {downWords.length > 0 && (
+                    <div className="clue-group">
+                      <div className="clue-group-title">Down</div>
+                      {downWords.map(w => (
+                        <div className="clue-row" key={w.number}>
+                          <span className="clue-num">{w.number}</span>
+                          <span className="clue-word">{getWordLetters(w.cells, grid)}</span>
+                          <input
+                            className="clue-input"
+                            placeholder="Enter clue…"
+                            value={clues[`down-${w.number}`] || ''}
+                            onChange={e => setClues(prev => ({ ...prev, [`down-${w.number}`]: e.target.value }))}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          </div>
+
+          <div className="export-section">
+            <div className="export-title">Export — paste into PUZZLES array in puzzles.js</div>
+            <textarea className="export-area" readOnly value={exportJson} />
+            <div className="export-actions">
+              <button className="btn btn-primary" onClick={handleCopy}>Copy to Clipboard</button>
+              {copyMsg && <span className="copy-confirm">{copyMsg}</span>}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>

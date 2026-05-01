@@ -48,11 +48,28 @@
       font-style: italic;
       margin-bottom: 4px;
     }
+    .header-meta {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
     .header-timer {
       font-size: 13px;
       letter-spacing: 0.06em;
       color: #444;
     }
+    .header-stats-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 15px;
+      padding: 0 2px;
+      line-height: 1;
+      opacity: 0.6;
+      transition: opacity 0.15s;
+    }
+    .header-stats-btn:hover { opacity: 1; }
 
     /* MAIN LAYOUT */
     .puzzle-layout {
@@ -124,6 +141,21 @@
     .btn:disabled:hover { background: transparent; color: #1a1a1a; }
     .btn.btn-primary:disabled:hover { background: #1a1a1a; color: #f5f0e8; }
 
+    /* MOBILE KEYBOARD */
+    .mobile-keyboard { display: none; margin-top: 16px; }
+    @media (max-width: 639px) { .mobile-keyboard { display: block; } }
+    .kb-row { display: flex; justify-content: center; gap: 4px; margin-bottom: 4px; }
+    .kb-key {
+      width: 30px; height: 40px;
+      font-family: 'Libre Baskerville', serif;
+      font-size: 13px; font-weight: 700;
+      border: 1.5px solid #1a1a1a;
+      background: #fff; cursor: pointer;
+      transition: background 0.1s;
+    }
+    .kb-key:active { background: #d4a843; }
+    .kb-wide { width: 64px; font-size: 16px; }
+
     /* CLUES */
     .clues-section { flex: 1; min-width: 0; }
     .clue-group { margin-bottom: 24px; }
@@ -150,7 +182,7 @@
     .clue.active { background: #d4a843; }
     .clue-num { font-weight: 700; flex-shrink: 0; min-width: 18px; }
 
-    /* REVEAL DIALOG */
+    /* DIALOGS */
     .dialog-backdrop {
       position: fixed;
       inset: 0;
@@ -164,7 +196,7 @@
       background: #f5f0e8;
       border: 2px solid #1a1a1a;
       padding: 32px 40px;
-      max-width: 340px;
+      max-width: 360px;
       width: 90%;
       text-align: center;
     }
@@ -181,6 +213,12 @@
       font-style: italic;
     }
     .dialog-buttons { display: flex; gap: 12px; justify-content: center; }
+
+    /* STATS MODAL */
+    .stats-grid { display: flex; gap: 32px; justify-content: center; margin-bottom: 28px; }
+    .stat { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .stat-num { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 700; }
+    .stat-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #666; }
 
     /* COMPLETION OVERLAY */
     .completion-overlay {
@@ -219,34 +257,14 @@
   <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="puzzles.js"></script>
 </head>
 <body>
   <div id="root"></div>
   <script type="text/babel">
-    const { useState, useEffect, useMemo } = React;
+    const { useState, useEffect, useMemo, useCallback } = React;
 
-    const PUZZLE = {
-      size: 5,
-      solution: [
-        ['T', 'E', 'M', 'P', 'O'],
-        ['A', null, 'O', null, 'K'],
-        ['L', 'A', 'S', 'E', 'R'],
-        ['E', null, 'S', null, 'A'],
-        ['S', 'T', 'Y', 'E', 'S'],
-      ],
-      clues: {
-        across: [
-          { number: 1, row: 0, col: 0, len: 5, clue: 'Adagio or allegro, e.g.' },
-          { number: 4, row: 2, col: 0, len: 5, clue: 'Light show staple' },
-          { number: 5, row: 4, col: 0, len: 5, clue: 'Pig pens or eye irritants' },
-        ],
-        down: [
-          { number: 1, row: 0, col: 0, len: 5, clue: "Scheherazade's stock in trade" },
-          { number: 2, row: 0, col: 2, len: 5, clue: 'Like a damp forest stone' },
-          { number: 3, row: 0, col: 4, len: 5, clue: 'Gumbo pods' },
-        ],
-      },
-    };
+    const PUZZLE = getDailyPuzzle();
 
     const CELL_NUMBERS = (() => {
       const map = {};
@@ -256,10 +274,18 @@
       return map;
     })();
 
+    // ── HELPERS ──────────────────────────────────────────────────
+
     function formatTime(seconds) {
       const m = Math.floor(seconds / 60);
       const s = seconds % 60;
       return `${m}:${s.toString().padStart(2, '0')}`;
+    }
+
+    function getPuzzleDate() {
+      const d = new Date(EPOCH);
+      d.setDate(d.getDate() + PUZZLE.dayIndex);
+      return d.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
     }
 
     function getWordCells(direction, row, col, solution) {
@@ -295,13 +321,41 @@
     }
 
     function checkSolved(userGrid, solution) {
-      for (let r = 0; r < 5; r++) {
-        for (let c = 0; c < 5; c++) {
+      for (let r = 0; r < 5; r++)
+        for (let c = 0; c < 5; c++)
           if (solution[r][c] !== null && userGrid[r][c] !== solution[r][c]) return false;
-        }
-      }
       return true;
     }
+
+    // ── STATS ────────────────────────────────────────────────────
+
+    function loadStats() {
+      try {
+        return JSON.parse(localStorage.getItem('crossword-stats')) || { solves: [], bestTime: null, streak: 0, lastSolveDate: null };
+      } catch { return { solves: [], bestTime: null, streak: 0, lastSolveDate: null }; }
+    }
+
+    function recordSolve(timeSeconds) {
+      const today = new Date().toISOString().slice(0, 10);
+      const stats = loadStats();
+      const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+
+      if (stats.lastSolveDate === today) return; // already recorded today
+
+      stats.solves.push({ date: today, time: timeSeconds });
+      stats.bestTime = stats.bestTime === null ? timeSeconds : Math.min(stats.bestTime, timeSeconds);
+
+      if (stats.lastSolveDate === yesterday) {
+        stats.streak = (stats.streak || 0) + 1;
+      } else {
+        stats.streak = 1;
+      }
+      stats.lastSolveDate = today;
+
+      localStorage.setItem('crossword-stats', JSON.stringify(stats));
+    }
+
+    // ── COMPONENTS ───────────────────────────────────────────────
 
     function Cell({ row, col, letter, isBlack, isSelected, isHighlighted, cellState, number, onClick }) {
       if (isBlack) return <div className="cell black" aria-hidden="true" />;
@@ -334,8 +388,7 @@
             row.map((cell, c) => (
               <Cell
                 key={`${r},${c}`}
-                row={r}
-                col={c}
+                row={r} col={c}
                 letter={userGrid[r][c]}
                 isBlack={cell === null}
                 isSelected={!!(selectedCell && selectedCell.row === r && selectedCell.col === c)}
@@ -350,14 +403,17 @@
       );
     }
 
-    function Header({ timerSeconds, timerStarted, solved }) {
+    function Header({ timerSeconds, timerStarted, solved, onStatsClick }) {
       const time = (timerStarted || solved) ? formatTime(timerSeconds) : '0:00';
       return (
         <header className="header">
           <div className="header-eyebrow">The Daily Crossword</div>
           <h1 className="header-title">Mini Crossword</h1>
-          <div className="header-dateline">Wednesday, May 1, 2026</div>
-          <div className="header-timer">{time}</div>
+          <div className="header-dateline">{getPuzzleDate()}</div>
+          <div className="header-meta">
+            <span className="header-timer">{time}</span>
+            <button className="header-stats-btn" onClick={onStatsClick} aria-label="View stats">📊</button>
+          </div>
         </header>
       );
     }
@@ -390,37 +446,54 @@
     function Controls({ onCheck, onReveal, solved, revealed }) {
       return (
         <div className="controls">
-          <button className="btn btn-primary" onClick={onCheck} disabled={solved || revealed}>
-            Check
-          </button>
-          <button className="btn" onClick={onReveal} disabled={solved || revealed}>
-            Reveal
-          </button>
+          <button className="btn btn-primary" onClick={onCheck} disabled={solved || revealed}>Check</button>
+          <button className="btn" onClick={onReveal} disabled={solved || revealed}>Reveal</button>
         </div>
       );
     }
 
-    function CompletionOverlay({ timerSeconds, visible }) {
-      const [opacity, setOpacity] = useState(0);
-
-      useEffect(() => {
-        if (!visible) { setOpacity(0); return; }
-        const showId = setTimeout(() => setOpacity(1), 50);
-        const hideId = setTimeout(() => setOpacity(0), 4000);
-        return () => { clearTimeout(showId); clearTimeout(hideId); };
-      }, [visible]);
-
-      if (!visible && opacity === 0) return null;
-
+    function MobileKeyboard({ onKey }) {
+      const rows = ['QWERTYUIOP', 'ASDFGHJKL', 'ZXCVBNM'];
       return (
-        <div
-          className="completion-overlay"
-          style={{ opacity, transition: 'opacity 0.5s ease' }}
-        >
-          <div className="completion-title">Solved!</div>
-          <div className="completion-time">{formatTime(timerSeconds)}</div>
-          <div className="completion-rule" />
-          <div className="completion-sub">Wednesday Mini · May 1, 2026</div>
+        <div className="mobile-keyboard">
+          {rows.map(row => (
+            <div className="kb-row" key={row}>
+              {row.split('').map(k => (
+                <button key={k} className="kb-key" onClick={() => onKey(k)}>{k}</button>
+              ))}
+            </div>
+          ))}
+          <div className="kb-row">
+            <button className="kb-key kb-wide" onClick={() => onKey('Backspace')}>⌫</button>
+          </div>
+        </div>
+      );
+    }
+
+    function StatsModal({ onClose }) {
+      const stats = loadStats();
+      return (
+        <div className="dialog-backdrop" onClick={onClose}>
+          <div className="dialog-card" onClick={e => e.stopPropagation()}>
+            <div className="dialog-title">Your Stats</div>
+            <div className="stats-grid">
+              <div className="stat">
+                <span className="stat-num">{stats.solves.length}</span>
+                <span className="stat-label">Solved</span>
+              </div>
+              <div className="stat">
+                <span className="stat-num">{stats.streak}</span>
+                <span className="stat-label">Streak</span>
+              </div>
+              <div className="stat">
+                <span className="stat-num">{stats.bestTime !== null ? formatTime(stats.bestTime) : '—'}</span>
+                <span className="stat-label">Best</span>
+              </div>
+            </div>
+            <div className="dialog-buttons">
+              <button className="btn btn-primary" onClick={onClose}>Done</button>
+            </div>
+          </div>
         </div>
       );
     }
@@ -440,6 +513,30 @@
       );
     }
 
+    function CompletionOverlay({ timerSeconds, visible }) {
+      const [opacity, setOpacity] = useState(0);
+
+      useEffect(() => {
+        if (!visible) { setOpacity(0); return; }
+        const showId = setTimeout(() => setOpacity(1), 50);
+        const hideId = setTimeout(() => setOpacity(0), 4000);
+        return () => { clearTimeout(showId); clearTimeout(hideId); };
+      }, [visible]);
+
+      if (!visible && opacity === 0) return null;
+
+      return (
+        <div className="completion-overlay" style={{ opacity, transition: 'opacity 0.5s ease' }}>
+          <div className="completion-title">Solved!</div>
+          <div className="completion-time">{formatTime(timerSeconds)}</div>
+          <div className="completion-rule" />
+          <div className="completion-sub">{getPuzzleDate()}</div>
+        </div>
+      );
+    }
+
+    // ── APP ──────────────────────────────────────────────────────
+
     function App() {
       const [userGrid, setUserGrid] = useState(() => PUZZLE.solution.map(row => row.map(() => '')));
       const [cellStates, setCellStates] = useState(() => Array(5).fill(null).map(() => Array(5).fill(null)));
@@ -450,6 +547,103 @@
       const [solved, setSolved] = useState(false);
       const [revealed, setRevealed] = useState(false);
       const [showRevealDialog, setShowRevealDialog] = useState(false);
+      const [showStats, setShowStats] = useState(false);
+
+      // Extracted key handler so both keyboard and mobile keyboard share it
+      const handleKey = useCallback((key) => {
+        if (!selectedCell || solved || revealed) return;
+        const { row, col } = selectedCell;
+
+        if (key.length === 1 && /[a-zA-Z]/.test(key)) {
+          if (!timerStarted) setTimerStarted(true);
+          const letter = key.toUpperCase();
+          const newGrid = userGrid.map(r => [...r]);
+          newGrid[row][col] = letter;
+          setUserGrid(newGrid);
+          const newStates = cellStates.map(r => [...r]);
+          newStates[row][col] = null;
+          setCellStates(newStates);
+          if (checkSolved(newGrid, PUZZLE.solution)) {
+            setSolved(true);
+            recordSolve(timerSeconds + (timerStarted ? 0 : 0));
+          }
+          const wordCells = getWordCells(direction, row, col, PUZZLE.solution);
+          const idx = wordCells.findIndex(c => c.row === row && c.col === col);
+          if (idx !== -1 && idx < wordCells.length - 1) setSelectedCell(wordCells[idx + 1]);
+
+        } else if (key === 'Backspace') {
+          if (!timerStarted) setTimerStarted(true);
+          if (userGrid[row][col] !== '') {
+            const newGrid = userGrid.map(r => [...r]);
+            newGrid[row][col] = '';
+            setUserGrid(newGrid);
+            const newStates = cellStates.map(r => [...r]);
+            newStates[row][col] = null;
+            setCellStates(newStates);
+          } else {
+            const wordCells = getWordCells(direction, row, col, PUZZLE.solution);
+            const idx = wordCells.findIndex(c => c.row === row && c.col === col);
+            if (idx > 0) {
+              const prev = wordCells[idx - 1];
+              setSelectedCell(prev);
+              const newGrid = userGrid.map(r => [...r]);
+              newGrid[prev.row][prev.col] = '';
+              setUserGrid(newGrid);
+            }
+          }
+        }
+      }, [selectedCell, direction, userGrid, cellStates, timerStarted, solved, revealed, timerSeconds]);
+
+      // Physical keyboard
+      useEffect(() => {
+        function onKeyDown(e) {
+          if (!selectedCell || solved || revealed) return;
+          const { row, col } = selectedCell;
+
+          if ((e.key.length === 1 && /[a-zA-Z]/.test(e.key)) || e.key === 'Backspace') {
+            e.preventDefault();
+            handleKey(e.key);
+          } else if (e.key.startsWith('Arrow')) {
+            e.preventDefault();
+            if (!timerStarted) setTimerStarted(true);
+            let nr = row, nc = col, newDir = direction;
+            if (e.key === 'ArrowRight') { nc = col + 1; newDir = 'across'; }
+            else if (e.key === 'ArrowLeft') { nc = col - 1; newDir = 'across'; }
+            else if (e.key === 'ArrowDown') { nr = row + 1; newDir = 'down'; }
+            else if (e.key === 'ArrowUp') { nr = row - 1; newDir = 'down'; }
+            if (nr >= 0 && nr < 5 && nc >= 0 && nc < 5 && PUZZLE.solution[nr][nc] !== null) {
+              setSelectedCell({ row: nr, col: nc });
+              setDirection(getValidDirection(newDir, nr, nc, PUZZLE.solution));
+            }
+          }
+        }
+        window.addEventListener('keydown', onKeyDown);
+        return () => window.removeEventListener('keydown', onKeyDown);
+      }, [selectedCell, direction, timerStarted, solved, revealed, handleKey]);
+
+      // Timer
+      useEffect(() => {
+        if (!timerStarted || solved || revealed) return;
+        const id = setInterval(() => setTimerSeconds(s => s + 1), 1000);
+        return () => clearInterval(id);
+      }, [timerStarted, solved, revealed]);
+
+      // Record solve when solved becomes true
+      useEffect(() => {
+        if (solved) recordSolve(timerSeconds);
+      }, [solved]);
+
+      const highlightedCells = useMemo(() => {
+        if (!selectedCell) return new Set();
+        const cells = getWordCells(direction, selectedCell.row, selectedCell.col, PUZZLE.solution);
+        return new Set(cells.map(c => `${c.row},${c.col}`));
+      }, [selectedCell, direction]);
+
+      const activeClue = useMemo(() => {
+        if (!selectedCell) return null;
+        const clue = getActiveClue(direction, selectedCell.row, selectedCell.col, PUZZLE.clues, PUZZLE.solution);
+        return clue ? { ...clue, direction } : null;
+      }, [selectedCell, direction]);
 
       function handleCellClick(row, col) {
         if (PUZZLE.solution[row][col] === null) return;
@@ -468,109 +662,6 @@
         setSelectedCell({ row: entry.row, col: entry.col });
       }
 
-      useEffect(() => {
-        function handleKeyDown(e) {
-          if (!selectedCell) return;
-          if (solved || revealed) return;
-
-          const { row, col } = selectedCell;
-
-          if (e.key.length === 1 && /[a-zA-Z]/.test(e.key)) {
-            e.preventDefault();
-            if (!timerStarted) setTimerStarted(true);
-
-            const letter = e.key.toUpperCase();
-            const newGrid = userGrid.map(r => [...r]);
-            newGrid[row][col] = letter;
-            setUserGrid(newGrid);
-
-            const newStates = cellStates.map(r => [...r]);
-            newStates[row][col] = null;
-            setCellStates(newStates);
-
-            if (checkSolved(newGrid, PUZZLE.solution)) {
-              setSolved(true);
-            }
-
-            const wordCells = getWordCells(direction, row, col, PUZZLE.solution);
-            const idx = wordCells.findIndex(c => c.row === row && c.col === col);
-            if (idx !== -1 && idx < wordCells.length - 1) {
-              setSelectedCell(wordCells[idx + 1]);
-            }
-
-          } else if (e.key === 'Backspace') {
-            e.preventDefault();
-            if (!timerStarted) setTimerStarted(true);
-
-            if (userGrid[row][col] !== '') {
-              const newGrid = userGrid.map(r => [...r]);
-              newGrid[row][col] = '';
-              setUserGrid(newGrid);
-              const newStates = cellStates.map(r => [...r]);
-              newStates[row][col] = null;
-              setCellStates(newStates);
-            } else {
-              const wordCells = getWordCells(direction, row, col, PUZZLE.solution);
-              const idx = wordCells.findIndex(c => c.row === row && c.col === col);
-              if (idx > 0) {
-                const prev = wordCells[idx - 1];
-                setSelectedCell(prev);
-                const newGrid = userGrid.map(r => [...r]);
-                newGrid[prev.row][prev.col] = '';
-                setUserGrid(newGrid);
-              }
-            }
-
-          } else if (e.key.startsWith('Arrow')) {
-            e.preventDefault();
-            if (!timerStarted) setTimerStarted(true);
-
-            let nr = row, nc = col, newDir = direction;
-            if (e.key === 'ArrowRight') { nc = col + 1; newDir = 'across'; }
-            else if (e.key === 'ArrowLeft') { nc = col - 1; newDir = 'across'; }
-            else if (e.key === 'ArrowDown') { nr = row + 1; newDir = 'down'; }
-            else if (e.key === 'ArrowUp') { nr = row - 1; newDir = 'down'; }
-
-            if (nr >= 0 && nr < 5 && nc >= 0 && nc < 5 && PUZZLE.solution[nr][nc] !== null) {
-              setSelectedCell({ row: nr, col: nc });
-              setDirection(getValidDirection(newDir, nr, nc, PUZZLE.solution));
-            }
-          }
-        }
-
-        window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
-      }, [selectedCell, direction, userGrid, cellStates, timerStarted, solved, revealed]);
-
-      useEffect(() => {
-        if (!timerStarted || solved || revealed) return;
-        const id = setInterval(() => setTimerSeconds(s => s + 1), 1000);
-        return () => clearInterval(id);
-      }, [timerStarted, solved, revealed]);
-
-      const highlightedCells = useMemo(() => {
-        if (!selectedCell) return new Set();
-        const cells = getWordCells(direction, selectedCell.row, selectedCell.col, PUZZLE.solution);
-        return new Set(cells.map(c => `${c.row},${c.col}`));
-      }, [selectedCell, direction]);
-
-      const activeClue = useMemo(() => {
-        if (!selectedCell) return null;
-        const clue = getActiveClue(direction, selectedCell.row, selectedCell.col, PUZZLE.clues, PUZZLE.solution);
-        return clue ? { ...clue, direction } : null;
-      }, [selectedCell, direction]);
-
-      function handleReveal() {
-        const fullGrid = PUZZLE.solution.map(row => row.map(cell => (cell === null ? '' : cell)));
-        setUserGrid(fullGrid);
-        const allCorrect = PUZZLE.solution.map(row =>
-          row.map(cell => (cell !== null ? 'correct' : null))
-        );
-        setCellStates(allCorrect);
-        setRevealed(true);
-        setShowRevealDialog(false);
-      }
-
       function handleCheck() {
         const newStates = PUZZLE.solution.map((row, r) =>
           row.map((cell, c) => {
@@ -582,9 +673,17 @@
         setCellStates(newStates);
       }
 
+      function handleReveal() {
+        const fullGrid = PUZZLE.solution.map(row => row.map(cell => (cell === null ? '' : cell)));
+        setUserGrid(fullGrid);
+        setCellStates(PUZZLE.solution.map(row => row.map(cell => (cell !== null ? 'correct' : null))));
+        setRevealed(true);
+        setShowRevealDialog(false);
+      }
+
       return (
         <div>
-          <Header timerSeconds={timerSeconds} timerStarted={timerStarted} solved={solved} />
+          <Header timerSeconds={timerSeconds} timerStarted={timerStarted} solved={solved} onStatsClick={() => setShowStats(true)} />
           <div className="puzzle-layout">
             <div className="grid-section">
               <div className="grid-wrap">
@@ -599,19 +698,12 @@
                 <CompletionOverlay timerSeconds={timerSeconds} visible={solved} />
               </div>
               <Controls onCheck={handleCheck} onReveal={() => setShowRevealDialog(true)} solved={solved} revealed={revealed} />
+              <MobileKeyboard onKey={handleKey} />
             </div>
-            <ClueList
-              clues={PUZZLE.clues}
-              activeClue={activeClue}
-              onClueClick={handleClueClick}
-            />
+            <ClueList clues={PUZZLE.clues} activeClue={activeClue} onClueClick={handleClueClick} />
           </div>
-          {showRevealDialog && (
-            <RevealDialog
-              onConfirm={handleReveal}
-              onCancel={() => setShowRevealDialog(false)}
-            />
-          )}
+          {showRevealDialog && <RevealDialog onConfirm={handleReveal} onCancel={() => setShowRevealDialog(false)} />}
+          {showStats && <StatsModal onClose={() => setShowStats(false)} />}
         </div>
       );
     }
