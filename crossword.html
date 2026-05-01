@@ -225,6 +225,84 @@
   <script type="text/babel">
     const { useState, useEffect, useMemo } = React;
 
+    const PUZZLE = {
+      size: 5,
+      solution: [
+        ['T', 'E', 'M', 'P', 'O'],
+        ['A', null, 'O', null, 'K'],
+        ['L', 'A', 'S', 'E', 'R'],
+        ['E', null, 'S', null, 'A'],
+        ['S', 'T', 'Y', 'E', 'S'],
+      ],
+      clues: {
+        across: [
+          { number: 1, row: 0, col: 0, len: 5, clue: 'Adagio or allegro, e.g.' },
+          { number: 4, row: 2, col: 0, len: 5, clue: 'Light show staple' },
+          { number: 5, row: 4, col: 0, len: 5, clue: 'Pig pens or eye irritants' },
+        ],
+        down: [
+          { number: 1, row: 0, col: 0, len: 5, clue: "Scheherazade's stock in trade" },
+          { number: 2, row: 0, col: 2, len: 5, clue: 'Like a damp forest stone' },
+          { number: 3, row: 0, col: 4, len: 5, clue: 'Gumbo pods' },
+        ],
+      },
+    };
+
+    const CELL_NUMBERS = (() => {
+      const map = {};
+      [...PUZZLE.clues.across, ...PUZZLE.clues.down].forEach(({ number, row, col }) => {
+        map[`${row},${col}`] = number;
+      });
+      return map;
+    })();
+
+    function formatTime(seconds) {
+      const m = Math.floor(seconds / 60);
+      const s = seconds % 60;
+      return `${m}:${s.toString().padStart(2, '0')}`;
+    }
+
+    function getWordCells(direction, row, col, solution) {
+      if (solution[row][col] === null) return [];
+      const cells = [];
+      if (direction === 'across') {
+        let c = col;
+        while (c > 0 && solution[row][c - 1] !== null) c--;
+        while (c < 5 && solution[row][c] !== null) { cells.push({ row, col: c }); c++; }
+      } else {
+        let r = row;
+        while (r > 0 && solution[r - 1][col] !== null) r--;
+        while (r < 5 && solution[r][col] !== null) { cells.push({ row: r, col }); r++; }
+      }
+      return cells.length >= 2 ? cells : [];
+    }
+
+    function hasWord(direction, row, col, solution) {
+      return getWordCells(direction, row, col, solution).length >= 2;
+    }
+
+    function getActiveClue(direction, row, col, clues, solution) {
+      const wordCells = getWordCells(direction, row, col, solution);
+      if (wordCells.length === 0) return null;
+      const { row: r0, col: c0 } = wordCells[0];
+      return clues[direction].find(c => c.row === r0 && c.col === c0) || null;
+    }
+
+    function getValidDirection(direction, row, col, solution) {
+      if (hasWord(direction, row, col, solution)) return direction;
+      const other = direction === 'across' ? 'down' : 'across';
+      return hasWord(other, row, col, solution) ? other : direction;
+    }
+
+    function checkSolved(userGrid, solution) {
+      for (let r = 0; r < 5; r++) {
+        for (let c = 0; c < 5; c++) {
+          if (solution[r][c] !== null && userGrid[r][c] !== solution[r][c]) return false;
+        }
+      }
+      return true;
+    }
+
     function App() {
       return (
         <header className="header">
