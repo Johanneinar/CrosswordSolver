@@ -405,7 +405,7 @@
       const [cellStates, setCellStates] = useState(() => Array(5).fill(null).map(() => Array(5).fill(null)));
       const [selectedCell, setSelectedCell] = useState(null);
       const [direction, setDirection] = useState('across');
-      const [timerSeconds] = useState(0);
+      const [timerSeconds, setTimerSeconds] = useState(0);
       const [timerStarted, setTimerStarted] = useState(false);
       const [solved] = useState(false);
       const [revealed] = useState(false);
@@ -497,6 +497,12 @@
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
       }, [selectedCell, direction, userGrid, cellStates, timerStarted, solved, revealed]);
+
+      useEffect(() => {
+        if (!timerStarted || solved || revealed) return;
+        const id = setInterval(() => setTimerSeconds(s => s + 1), 1000);
+        return () => clearInterval(id);
+      }, [timerStarted, solved, revealed]);
 
       const highlightedCells = useMemo(() => {
         if (!selectedCell) return new Set();
