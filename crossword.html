@@ -403,10 +403,42 @@
     function App() {
       const [userGrid] = useState(() => PUZZLE.solution.map(row => row.map(() => '')));
       const [cellStates] = useState(() => Array(5).fill(null).map(() => Array(5).fill(null)));
+      const [selectedCell, setSelectedCell] = useState(null);
+      const [direction, setDirection] = useState('across');
       const [timerSeconds] = useState(0);
       const [timerStarted] = useState(false);
       const [solved] = useState(false);
       const [revealed] = useState(false);
+      const [showRevealDialog] = useState(false);
+
+      function handleCellClick(row, col) {
+        if (PUZZLE.solution[row][col] === null) return;
+        if (selectedCell && selectedCell.row === row && selectedCell.col === col) {
+          const toggled = direction === 'across' ? 'down' : 'across';
+          setDirection(getValidDirection(toggled, row, col, PUZZLE.solution));
+        } else {
+          const validDir = getValidDirection(direction, row, col, PUZZLE.solution);
+          setDirection(validDir);
+          setSelectedCell({ row, col });
+        }
+      }
+
+      function handleClueClick(dir, entry) {
+        setDirection(dir);
+        setSelectedCell({ row: entry.row, col: entry.col });
+      }
+
+      const highlightedCells = useMemo(() => {
+        if (!selectedCell) return new Set();
+        const cells = getWordCells(direction, selectedCell.row, selectedCell.col, PUZZLE.solution);
+        return new Set(cells.map(c => `${c.row},${c.col}`));
+      }, [selectedCell, direction]);
+
+      const activeClue = useMemo(() => {
+        if (!selectedCell) return null;
+        const clue = getActiveClue(direction, selectedCell.row, selectedCell.col, PUZZLE.clues, PUZZLE.solution);
+        return clue ? { ...clue, direction } : null;
+      }, [selectedCell, direction]);
 
       return (
         <div>
@@ -417,18 +449,18 @@
                 <Grid
                   solution={PUZZLE.solution}
                   userGrid={userGrid}
-                  selectedCell={null}
-                  highlightedCells={new Set()}
+                  selectedCell={selectedCell}
+                  highlightedCells={highlightedCells}
                   cellStates={cellStates}
-                  onCellClick={() => {}}
+                  onCellClick={handleCellClick}
                 />
               </div>
               <Controls onCheck={() => {}} onReveal={() => {}} solved={solved} revealed={revealed} />
             </div>
             <ClueList
               clues={PUZZLE.clues}
-              activeClue={null}
-              onClueClick={() => {}}
+              activeClue={activeClue}
+              onClueClick={handleClueClick}
             />
           </div>
         </div>
