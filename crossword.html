@@ -303,11 +303,78 @@
       return true;
     }
 
-    function App() {
+    function Cell({ row, col, letter, isBlack, isSelected, isHighlighted, cellState, number, onClick }) {
+      if (isBlack) return <div className="cell black" aria-hidden="true" />;
+
+      let className = 'cell';
+      if (isSelected) className += ' selected';
+      else if (isHighlighted) className += ' highlighted';
+      if (cellState === 'correct') className += ' correct';
+      if (cellState === 'wrong') className += ' wrong';
+
       return (
-        <header className="header">
-          <h1 className="header-title">Mini Crossword</h1>
-        </header>
+        <div
+          className={className}
+          onClick={onClick}
+          role="gridcell"
+          tabIndex={0}
+          aria-selected={isSelected}
+          aria-label={`Row ${row + 1}, column ${col + 1}${letter ? ', letter ' + letter : ''}`}
+        >
+          {number && <span className="cell-number">{number}</span>}
+          {letter}
+        </div>
+      );
+    }
+
+    function Grid({ solution, userGrid, selectedCell, highlightedCells, cellStates, onCellClick }) {
+      return (
+        <div className="grid" role="grid" aria-label="Crossword grid">
+          {solution.map((row, r) =>
+            row.map((cell, c) => (
+              <Cell
+                key={`${r},${c}`}
+                row={r}
+                col={c}
+                letter={userGrid[r][c]}
+                isBlack={cell === null}
+                isSelected={!!(selectedCell && selectedCell.row === r && selectedCell.col === c)}
+                isHighlighted={highlightedCells.has(`${r},${c}`)}
+                cellState={cellStates[r][c]}
+                number={CELL_NUMBERS[`${r},${c}`]}
+                onClick={() => onCellClick(r, c)}
+              />
+            ))
+          )}
+        </div>
+      );
+    }
+
+    function App() {
+      const [userGrid] = useState(() => PUZZLE.solution.map(row => row.map(() => '')));
+      const [cellStates] = useState(() => Array(5).fill(null).map(() => Array(5).fill(null)));
+
+      return (
+        <div>
+          <header className="header">
+            <div className="header-eyebrow">The Daily Crossword</div>
+            <h1 className="header-title">Mini Crossword</h1>
+          </header>
+          <div className="puzzle-layout">
+            <div className="grid-section">
+              <div className="grid-wrap">
+                <Grid
+                  solution={PUZZLE.solution}
+                  userGrid={userGrid}
+                  selectedCell={null}
+                  highlightedCells={new Set()}
+                  cellStates={cellStates}
+                  onCellClick={() => {}}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
       );
     }
 
