@@ -350,16 +350,67 @@
       );
     }
 
+    function Header({ timerSeconds, timerStarted, solved }) {
+      const time = (timerStarted || solved) ? formatTime(timerSeconds) : '0:00';
+      return (
+        <header className="header">
+          <div className="header-eyebrow">The Daily Crossword</div>
+          <h1 className="header-title">Mini Crossword</h1>
+          <div className="header-dateline">Wednesday, May 1, 2026</div>
+          <div className="header-timer">{time}</div>
+        </header>
+      );
+    }
+
+    function ClueList({ clues, activeClue, onClueClick }) {
+      const isActive = (dir, entry) =>
+        activeClue && activeClue.direction === dir && activeClue.number === entry.number;
+
+      return (
+        <div className="clues-section">
+          {['across', 'down'].map(dir => (
+            <div className="clue-group" key={dir}>
+              <div className="clue-group-title">{dir}</div>
+              {clues[dir].map(entry => (
+                <div
+                  key={entry.number}
+                  className={`clue${isActive(dir, entry) ? ' active' : ''}`}
+                  onClick={() => onClueClick(dir, entry)}
+                >
+                  <span className="clue-num">{entry.number}</span>
+                  <span>{entry.clue}</span>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    function Controls({ onCheck, onReveal, solved, revealed }) {
+      return (
+        <div className="controls">
+          <button className="btn btn-primary" onClick={onCheck} disabled={solved || revealed}>
+            Check
+          </button>
+          <button className="btn" onClick={onReveal} disabled={solved || revealed}>
+            Reveal
+          </button>
+        </div>
+      );
+    }
+
     function App() {
       const [userGrid] = useState(() => PUZZLE.solution.map(row => row.map(() => '')));
       const [cellStates] = useState(() => Array(5).fill(null).map(() => Array(5).fill(null)));
+      const [timerSeconds] = useState(0);
+      const [timerStarted] = useState(false);
+      const [solved] = useState(false);
+      const [revealed] = useState(false);
 
       return (
         <div>
-          <header className="header">
-            <div className="header-eyebrow">The Daily Crossword</div>
-            <h1 className="header-title">Mini Crossword</h1>
-          </header>
+          <Header timerSeconds={timerSeconds} timerStarted={timerStarted} solved={solved} />
           <div className="puzzle-layout">
             <div className="grid-section">
               <div className="grid-wrap">
@@ -372,7 +423,13 @@
                   onCellClick={() => {}}
                 />
               </div>
+              <Controls onCheck={() => {}} onReveal={() => {}} solved={solved} revealed={revealed} />
             </div>
+            <ClueList
+              clues={PUZZLE.clues}
+              activeClue={null}
+              onClueClick={() => {}}
+            />
           </div>
         </div>
       );
