@@ -40,36 +40,62 @@
       font-size: 42px;
       font-weight: 700;
       letter-spacing: -0.5px;
+      margin-bottom: 10px;
+    }
+    .header-nav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
       margin-bottom: 6px;
     }
+    .nav-btn {
+      background: none;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+      color: #1a1a1a;
+      padding: 0 4px;
+      line-height: 1;
+      opacity: 0.7;
+      transition: opacity 0.15s;
+    }
+    .nav-btn:hover:not(:disabled) { opacity: 1; }
+    .nav-btn:disabled { opacity: 0.2; cursor: default; }
     .header-dateline {
       font-size: 13px;
-      color: #666;
+      color: #444;
       font-style: italic;
-      margin-bottom: 4px;
     }
     .header-meta {
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
+      margin-top: 4px;
     }
-    .header-timer {
-      font-size: 13px;
-      letter-spacing: 0.06em;
-      color: #444;
-    }
+    .header-timer { font-size: 13px; letter-spacing: 0.06em; color: #444; }
     .header-stats-btn {
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-size: 15px;
-      padding: 0 2px;
-      line-height: 1;
-      opacity: 0.6;
+      background: none; border: none; cursor: pointer;
+      font-size: 15px; padding: 0 2px; opacity: 0.6;
       transition: opacity 0.15s;
     }
     .header-stats-btn:hover { opacity: 1; }
+
+    /* ALREADY SOLVED BANNER */
+    .solved-banner {
+      background: #c8e6c9;
+      border: 1.5px solid #1a1a1a;
+      padding: 10px 20px;
+      margin-bottom: 20px;
+      text-align: center;
+      font-size: 13px;
+      width: 100%;
+      max-width: 780px;
+    }
+    .solved-banner strong {
+      font-family: 'Playfair Display', serif;
+    }
 
     /* MAIN LAYOUT */
     .puzzle-layout {
@@ -90,19 +116,14 @@
       border: 2px solid #1a1a1a;
     }
     .cell {
-      width: 58px;
-      height: 58px;
+      width: 58px; height: 58px;
       border: 1px solid #1a1a1a;
       background: #ffffff;
       position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: flex; align-items: center; justify-content: center;
       font-family: 'Playfair Display', serif;
-      font-size: 20px;
-      font-weight: 700;
-      cursor: pointer;
-      user-select: none;
+      font-size: 20px; font-weight: 700;
+      cursor: pointer; user-select: none;
     }
     .cell.black { background: #1a1a1a; cursor: default; }
     .cell.highlighted { background: #dce8f5; }
@@ -110,36 +131,30 @@
     .cell.correct { background: #c8e6c9; }
     .cell.wrong { background: #ffcdd2; }
     .cell-number {
-      position: absolute;
-      top: 3px;
-      left: 3px;
-      font-size: 9px;
-      font-weight: 400;
+      position: absolute; top: 3px; left: 3px;
+      font-size: 9px; font-weight: 400;
       font-family: 'Libre Baskerville', serif;
-      color: #1a1a1a;
-      line-height: 1;
+      color: #1a1a1a; line-height: 1;
     }
 
     /* CONTROLS */
-    .controls { display: flex; gap: 12px; margin-top: 18px; }
+    .controls { display: flex; gap: 12px; margin-top: 18px; flex-wrap: wrap; }
     .btn {
       padding: 8px 20px;
       font-family: 'Libre Baskerville', serif;
-      font-size: 12px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      border: 1.5px solid #1a1a1a;
-      background: transparent;
-      color: #1a1a1a;
-      cursor: pointer;
-      transition: background 0.15s, color 0.15s;
+      font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;
+      border: 1.5px solid #1a1a1a; background: transparent; color: #1a1a1a;
+      cursor: pointer; transition: background 0.15s, color 0.15s;
     }
     .btn:hover { background: #1a1a1a; color: #f5f0e8; }
     .btn.btn-primary { background: #1a1a1a; color: #f5f0e8; }
     .btn.btn-primary:hover { background: #333; }
+    .btn.btn-share { border-color: #2e7d32; color: #2e7d32; }
+    .btn.btn-share:hover { background: #2e7d32; color: #fff; }
     .btn:disabled { opacity: 0.4; cursor: default; }
     .btn:disabled:hover { background: transparent; color: #1a1a1a; }
     .btn.btn-primary:disabled:hover { background: #1a1a1a; color: #f5f0e8; }
+    .share-confirm { font-size: 12px; color: #2e7d32; font-style: italic; margin-top: 6px; }
 
     /* MOBILE KEYBOARD */
     .mobile-keyboard { display: none; margin-top: 16px; }
@@ -149,8 +164,7 @@
       width: 30px; height: 40px;
       font-family: 'Libre Baskerville', serif;
       font-size: 13px; font-weight: 700;
-      border: 1.5px solid #1a1a1a;
-      background: #fff; cursor: pointer;
+      border: 1.5px solid #1a1a1a; background: #fff; cursor: pointer;
       transition: background 0.1s;
     }
     .kb-key:active { background: #d4a843; }
@@ -161,22 +175,12 @@
     .clue-group { margin-bottom: 24px; }
     .clue-group-title {
       font-family: 'Playfair Display', serif;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      border-bottom: 1px solid #1a1a1a;
-      padding-bottom: 5px;
-      margin-bottom: 10px;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase;
+      border-bottom: 1px solid #1a1a1a; padding-bottom: 5px; margin-bottom: 10px;
     }
     .clue {
-      display: flex;
-      gap: 8px;
-      padding: 4px 6px;
-      font-size: 13px;
-      line-height: 1.5;
-      border-radius: 2px;
-      cursor: pointer;
+      display: flex; gap: 8px; padding: 4px 6px;
+      font-size: 13px; line-height: 1.5; border-radius: 2px; cursor: pointer;
     }
     .clue:hover { background: rgba(212, 168, 67, 0.2); }
     .clue.active { background: #d4a843; }
@@ -184,37 +188,18 @@
 
     /* DIALOGS */
     .dialog-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.4);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 100;
+      position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+      display: flex; align-items: center; justify-content: center; z-index: 100;
     }
     .dialog-card {
-      background: #f5f0e8;
-      border: 2px solid #1a1a1a;
-      padding: 32px 40px;
-      max-width: 360px;
-      width: 90%;
-      text-align: center;
+      background: #f5f0e8; border: 2px solid #1a1a1a;
+      padding: 32px 40px; max-width: 360px; width: 90%; text-align: center;
     }
-    .dialog-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 20px;
-      margin-bottom: 12px;
-    }
-    .dialog-body {
-      font-size: 13px;
-      color: #555;
-      margin-bottom: 24px;
-      line-height: 1.6;
-      font-style: italic;
-    }
+    .dialog-title { font-family: 'Playfair Display', serif; font-size: 20px; margin-bottom: 12px; }
+    .dialog-body { font-size: 13px; color: #555; margin-bottom: 24px; line-height: 1.6; font-style: italic; }
     .dialog-buttons { display: flex; gap: 12px; justify-content: center; }
 
-    /* STATS MODAL */
+    /* STATS */
     .stats-grid { display: flex; gap: 32px; justify-content: center; margin-bottom: 28px; }
     .stat { display: flex; flex-direction: column; align-items: center; gap: 4px; }
     .stat-num { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 700; }
@@ -222,29 +207,13 @@
 
     /* COMPLETION OVERLAY */
     .completion-overlay {
-      position: absolute;
-      inset: -2px;
+      position: absolute; inset: -2px;
       background: rgba(245, 240, 232, 0.94);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      z-index: 10;
-      border: 2px solid #1a1a1a;
-      pointer-events: none;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      z-index: 10; border: 2px solid #1a1a1a; pointer-events: none;
     }
-    .completion-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 28px;
-      font-weight: 700;
-      margin-bottom: 6px;
-    }
-    .completion-time {
-      font-size: 13px;
-      color: #555;
-      letter-spacing: 0.06em;
-      margin-bottom: 14px;
-    }
+    .completion-title { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; margin-bottom: 6px; }
+    .completion-time { font-size: 13px; color: #555; letter-spacing: 0.06em; margin-bottom: 14px; }
     .completion-rule { width: 40px; height: 1px; background: #1a1a1a; margin-bottom: 14px; }
     .completion-sub { font-size: 12px; color: #888; font-style: italic; }
 
@@ -264,16 +233,6 @@
   <script type="text/babel">
     const { useState, useEffect, useMemo, useCallback } = React;
 
-    const PUZZLE = getDailyPuzzle();
-
-    const CELL_NUMBERS = (() => {
-      const map = {};
-      [...PUZZLE.clues.across, ...PUZZLE.clues.down].forEach(({ number, row, col }) => {
-        map[`${row},${col}`] = number;
-      });
-      return map;
-    })();
-
     // ── HELPERS ──────────────────────────────────────────────────
 
     function formatTime(seconds) {
@@ -282,9 +241,9 @@
       return `${m}:${s.toString().padStart(2, '0')}`;
     }
 
-    function getPuzzleDate() {
+    function formatDate(dayIndex) {
       const d = new Date(EPOCH);
-      d.setDate(d.getDate() + PUZZLE.dayIndex);
+      d.setDate(d.getDate() + dayIndex);
       return d.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
     }
 
@@ -331,27 +290,24 @@
 
     function loadStats() {
       try {
-        return JSON.parse(localStorage.getItem('crossword-stats')) || { solves: [], bestTime: null, streak: 0, lastSolveDate: null };
-      } catch { return { solves: [], bestTime: null, streak: 0, lastSolveDate: null }; }
+        return JSON.parse(localStorage.getItem('crossword-stats')) ||
+          { solves: [], bestTime: null, streak: 0, lastSolveDate: null, solvedDays: {} };
+      } catch {
+        return { solves: [], bestTime: null, streak: 0, lastSolveDate: null, solvedDays: {} };
+      }
     }
 
-    function recordSolve(timeSeconds) {
+    function recordSolve(dayIndex, timeSeconds) {
       const today = new Date().toISOString().slice(0, 10);
       const stats = loadStats();
+      if (!stats.solvedDays) stats.solvedDays = {};
+      if (stats.solvedDays[dayIndex] !== undefined) return; // already recorded
       const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
-
-      if (stats.lastSolveDate === today) return; // already recorded today
-
       stats.solves.push({ date: today, time: timeSeconds });
       stats.bestTime = stats.bestTime === null ? timeSeconds : Math.min(stats.bestTime, timeSeconds);
-
-      if (stats.lastSolveDate === yesterday) {
-        stats.streak = (stats.streak || 0) + 1;
-      } else {
-        stats.streak = 1;
-      }
+      stats.streak = stats.lastSolveDate === yesterday ? (stats.streak || 0) + 1 : 1;
       stats.lastSolveDate = today;
-
+      stats.solvedDays[dayIndex] = timeSeconds;
       localStorage.setItem('crossword-stats', JSON.stringify(stats));
     }
 
@@ -359,57 +315,53 @@
 
     function Cell({ row, col, letter, isBlack, isSelected, isHighlighted, cellState, number, onClick }) {
       if (isBlack) return <div className="cell black" aria-hidden="true" />;
-
       let className = 'cell';
       if (isSelected) className += ' selected';
       else if (isHighlighted) className += ' highlighted';
       if (cellState === 'correct') className += ' correct';
       if (cellState === 'wrong') className += ' wrong';
-
       return (
-        <div
-          className={className}
-          onClick={onClick}
-          role="gridcell"
-          tabIndex={0}
+        <div className={className} onClick={onClick} role="gridcell" tabIndex={0}
           aria-selected={isSelected}
-          aria-label={`Row ${row + 1}, column ${col + 1}${letter ? ', letter ' + letter : ''}`}
-        >
+          aria-label={`Row ${row + 1}, column ${col + 1}${letter ? ', letter ' + letter : ''}`}>
           {number && <span className="cell-number">{number}</span>}
           {letter}
         </div>
       );
     }
 
-    function Grid({ solution, userGrid, selectedCell, highlightedCells, cellStates, onCellClick }) {
+    function Grid({ solution, userGrid, selectedCell, highlightedCells, cellStates, cellNumbers, onCellClick }) {
       return (
         <div className="grid" role="grid" aria-label="Crossword grid">
           {solution.map((row, r) =>
             row.map((cell, c) => (
-              <Cell
-                key={`${r},${c}`}
-                row={r} col={c}
+              <Cell key={`${r},${c}`} row={r} col={c}
                 letter={userGrid[r][c]}
                 isBlack={cell === null}
                 isSelected={!!(selectedCell && selectedCell.row === r && selectedCell.col === c)}
                 isHighlighted={highlightedCells.has(`${r},${c}`)}
                 cellState={cellStates[r][c]}
-                number={CELL_NUMBERS[`${r},${c}`]}
-                onClick={() => onCellClick(r, c)}
-              />
+                number={cellNumbers[`${r},${c}`]}
+                onClick={() => onCellClick(r, c)} />
             ))
           )}
         </div>
       );
     }
 
-    function Header({ timerSeconds, timerStarted, solved, onStatsClick }) {
-      const time = (timerStarted || solved) ? formatTime(timerSeconds) : '0:00';
+    function Header({ timerSeconds, timerStarted, solved, alreadySolved, dayIndex, dayOffset, onPrev, onNext, onStatsClick }) {
+      const time = (timerStarted || solved || alreadySolved) ? formatTime(timerSeconds) : '0:00';
+      const today = new Date(); today.setHours(0,0,0,0);
+      const currentDayIndex = Math.floor((today - EPOCH) / 86400000);
       return (
         <header className="header">
           <div className="header-eyebrow">The Daily Crossword</div>
           <h1 className="header-title">Mini Crossword</h1>
-          <div className="header-dateline">{getPuzzleDate()}</div>
+          <div className="header-nav">
+            <button className="nav-btn" onClick={onPrev} aria-label="Previous puzzle">‹</button>
+            <span className="header-dateline">{formatDate(dayIndex)}</span>
+            <button className="nav-btn" onClick={onNext} disabled={dayOffset >= 0} aria-label="Next puzzle">›</button>
+          </div>
           <div className="header-meta">
             <span className="header-timer">{time}</span>
             <button className="header-stats-btn" onClick={onStatsClick} aria-label="View stats">📊</button>
@@ -421,18 +373,14 @@
     function ClueList({ clues, activeClue, onClueClick }) {
       const isActive = (dir, entry) =>
         activeClue && activeClue.direction === dir && activeClue.number === entry.number;
-
       return (
         <div className="clues-section">
           {['across', 'down'].map(dir => (
             <div className="clue-group" key={dir}>
               <div className="clue-group-title">{dir}</div>
               {clues[dir].map(entry => (
-                <div
-                  key={entry.number}
-                  className={`clue${isActive(dir, entry) ? ' active' : ''}`}
-                  onClick={() => onClueClick(dir, entry)}
-                >
+                <div key={entry.number} className={`clue${isActive(dir, entry) ? ' active' : ''}`}
+                  onClick={() => onClueClick(dir, entry)}>
                   <span className="clue-num">{entry.number}</span>
                   <span>{entry.clue}</span>
                 </div>
@@ -443,11 +391,16 @@
       );
     }
 
-    function Controls({ onCheck, onReveal, solved, revealed }) {
+    function Controls({ onCheck, onReveal, onShare, solved, revealed, alreadySolved, shareConfirm }) {
+      const done = solved || revealed || alreadySolved;
       return (
-        <div className="controls">
-          <button className="btn btn-primary" onClick={onCheck} disabled={solved || revealed}>Check</button>
-          <button className="btn" onClick={onReveal} disabled={solved || revealed}>Reveal</button>
+        <div>
+          <div className="controls">
+            <button className="btn btn-primary" onClick={onCheck} disabled={done}>Check</button>
+            <button className="btn" onClick={onReveal} disabled={done}>Reveal</button>
+            {done && <button className="btn btn-share" onClick={onShare}>Share</button>}
+          </div>
+          {shareConfirm && <div className="share-confirm">{shareConfirm}</div>}
         </div>
       );
     }
@@ -477,22 +430,11 @@
           <div className="dialog-card" onClick={e => e.stopPropagation()}>
             <div className="dialog-title">Your Stats</div>
             <div className="stats-grid">
-              <div className="stat">
-                <span className="stat-num">{stats.solves.length}</span>
-                <span className="stat-label">Solved</span>
-              </div>
-              <div className="stat">
-                <span className="stat-num">{stats.streak}</span>
-                <span className="stat-label">Streak</span>
-              </div>
-              <div className="stat">
-                <span className="stat-num">{stats.bestTime !== null ? formatTime(stats.bestTime) : '—'}</span>
-                <span className="stat-label">Best</span>
-              </div>
+              <div className="stat"><span className="stat-num">{stats.solves.length}</span><span className="stat-label">Solved</span></div>
+              <div className="stat"><span className="stat-num">{stats.streak}</span><span className="stat-label">Streak</span></div>
+              <div className="stat"><span className="stat-num">{stats.bestTime !== null ? formatTime(stats.bestTime) : '—'}</span><span className="stat-label">Best</span></div>
             </div>
-            <div className="dialog-buttons">
-              <button className="btn btn-primary" onClick={onClose}>Done</button>
-            </div>
+            <div className="dialog-buttons"><button className="btn btn-primary" onClick={onClose}>Done</button></div>
           </div>
         </div>
       );
@@ -513,24 +455,21 @@
       );
     }
 
-    function CompletionOverlay({ timerSeconds, visible }) {
+    function CompletionOverlay({ timerSeconds, visible, dayIndex }) {
       const [opacity, setOpacity] = useState(0);
-
       useEffect(() => {
         if (!visible) { setOpacity(0); return; }
-        const showId = setTimeout(() => setOpacity(1), 50);
-        const hideId = setTimeout(() => setOpacity(0), 4000);
-        return () => { clearTimeout(showId); clearTimeout(hideId); };
+        const s = setTimeout(() => setOpacity(1), 50);
+        const h = setTimeout(() => setOpacity(0), 4000);
+        return () => { clearTimeout(s); clearTimeout(h); };
       }, [visible]);
-
       if (!visible && opacity === 0) return null;
-
       return (
         <div className="completion-overlay" style={{ opacity, transition: 'opacity 0.5s ease' }}>
           <div className="completion-title">Solved!</div>
           <div className="completion-time">{formatTime(timerSeconds)}</div>
           <div className="completion-rule" />
-          <div className="completion-sub">{getPuzzleDate()}</div>
+          <div className="completion-sub">{formatDate(dayIndex)}</div>
         </div>
       );
     }
@@ -538,20 +477,60 @@
     // ── APP ──────────────────────────────────────────────────────
 
     function App() {
-      const [userGrid, setUserGrid] = useState(() => PUZZLE.solution.map(row => row.map(() => '')));
-      const [cellStates, setCellStates] = useState(() => Array(5).fill(null).map(() => Array(5).fill(null)));
+      const [dayOffset, setDayOffset] = useState(0);
+      const puzzle = useMemo(() => getPuzzleForDay(dayOffset), [dayOffset]);
+
+      const cellNumbers = useMemo(() => {
+        const map = {};
+        [...puzzle.clues.across, ...puzzle.clues.down].forEach(({ number, row, col }) => {
+          map[`${row},${col}`] = number;
+        });
+        return map;
+      }, [puzzle]);
+
+      const emptyGrid = () => puzzle.solution.map(row => row.map(() => ''));
+      const emptyStates = () => Array(5).fill(null).map(() => Array(5).fill(null));
+
+      const [userGrid, setUserGrid] = useState(emptyGrid);
+      const [cellStates, setCellStates] = useState(emptyStates);
       const [selectedCell, setSelectedCell] = useState(null);
       const [direction, setDirection] = useState('across');
       const [timerSeconds, setTimerSeconds] = useState(0);
       const [timerStarted, setTimerStarted] = useState(false);
       const [solved, setSolved] = useState(false);
       const [revealed, setRevealed] = useState(false);
+      const [alreadySolved, setAlreadySolved] = useState(false);
       const [showRevealDialog, setShowRevealDialog] = useState(false);
       const [showStats, setShowStats] = useState(false);
+      const [shareConfirm, setShareConfirm] = useState('');
 
-      // Extracted key handler so both keyboard and mobile keyboard share it
+      // Reset state when puzzle changes (dayOffset changes)
+      useEffect(() => {
+        setUserGrid(emptyGrid());
+        setCellStates(emptyStates());
+        setSelectedCell(null);
+        setDirection('across');
+        setTimerSeconds(0);
+        setTimerStarted(false);
+        setSolved(false);
+        setRevealed(false);
+        setAlreadySolved(false);
+        setShareConfirm('');
+
+        // Check if already solved
+        const stats = loadStats();
+        const savedTime = stats.solvedDays && stats.solvedDays[puzzle.dayIndex];
+        if (savedTime !== undefined) {
+          setAlreadySolved(true);
+          setTimerSeconds(savedTime);
+          const filledGrid = puzzle.solution.map(row => row.map(cell => cell === null ? '' : cell));
+          setUserGrid(filledGrid);
+          setCellStates(puzzle.solution.map(row => row.map(cell => cell !== null ? 'correct' : null)));
+        }
+      }, [puzzle.dayIndex]);
+
       const handleKey = useCallback((key) => {
-        if (!selectedCell || solved || revealed) return;
+        if (!selectedCell || solved || revealed || alreadySolved) return;
         const { row, col } = selectedCell;
 
         if (key.length === 1 && /[a-zA-Z]/.test(key)) {
@@ -563,11 +542,11 @@
           const newStates = cellStates.map(r => [...r]);
           newStates[row][col] = null;
           setCellStates(newStates);
-          if (checkSolved(newGrid, PUZZLE.solution)) {
+          if (checkSolved(newGrid, puzzle.solution)) {
             setSolved(true);
-            recordSolve(timerSeconds + (timerStarted ? 0 : 0));
+            recordSolve(puzzle.dayIndex, timerSeconds);
           }
-          const wordCells = getWordCells(direction, row, col, PUZZLE.solution);
+          const wordCells = getWordCells(direction, row, col, puzzle.solution);
           const idx = wordCells.findIndex(c => c.row === row && c.col === col);
           if (idx !== -1 && idx < wordCells.length - 1) setSelectedCell(wordCells[idx + 1]);
 
@@ -581,7 +560,7 @@
             newStates[row][col] = null;
             setCellStates(newStates);
           } else {
-            const wordCells = getWordCells(direction, row, col, PUZZLE.solution);
+            const wordCells = getWordCells(direction, row, col, puzzle.solution);
             const idx = wordCells.findIndex(c => c.row === row && c.col === col);
             if (idx > 0) {
               const prev = wordCells[idx - 1];
@@ -592,14 +571,13 @@
             }
           }
         }
-      }, [selectedCell, direction, userGrid, cellStates, timerStarted, solved, revealed, timerSeconds]);
+      }, [selectedCell, direction, userGrid, cellStates, timerStarted, solved, revealed, alreadySolved, timerSeconds, puzzle]);
 
       // Physical keyboard
       useEffect(() => {
         function onKeyDown(e) {
-          if (!selectedCell || solved || revealed) return;
+          if (!selectedCell || solved || revealed || alreadySolved) return;
           const { row, col } = selectedCell;
-
           if ((e.key.length === 1 && /[a-zA-Z]/.test(e.key)) || e.key === 'Backspace') {
             e.preventDefault();
             handleKey(e.key);
@@ -611,59 +589,49 @@
             else if (e.key === 'ArrowLeft') { nc = col - 1; newDir = 'across'; }
             else if (e.key === 'ArrowDown') { nr = row + 1; newDir = 'down'; }
             else if (e.key === 'ArrowUp') { nr = row - 1; newDir = 'down'; }
-            if (nr >= 0 && nr < 5 && nc >= 0 && nc < 5 && PUZZLE.solution[nr][nc] !== null) {
+            if (nr >= 0 && nr < 5 && nc >= 0 && nc < 5 && puzzle.solution[nr][nc] !== null) {
               setSelectedCell({ row: nr, col: nc });
-              setDirection(getValidDirection(newDir, nr, nc, PUZZLE.solution));
+              setDirection(getValidDirection(newDir, nr, nc, puzzle.solution));
             }
           }
         }
         window.addEventListener('keydown', onKeyDown);
         return () => window.removeEventListener('keydown', onKeyDown);
-      }, [selectedCell, direction, timerStarted, solved, revealed, handleKey]);
+      }, [selectedCell, direction, timerStarted, solved, revealed, alreadySolved, handleKey, puzzle]);
 
       // Timer
       useEffect(() => {
-        if (!timerStarted || solved || revealed) return;
+        if (!timerStarted || solved || revealed || alreadySolved) return;
         const id = setInterval(() => setTimerSeconds(s => s + 1), 1000);
         return () => clearInterval(id);
-      }, [timerStarted, solved, revealed]);
-
-      // Record solve when solved becomes true
-      useEffect(() => {
-        if (solved) recordSolve(timerSeconds);
-      }, [solved]);
+      }, [timerStarted, solved, revealed, alreadySolved]);
 
       const highlightedCells = useMemo(() => {
         if (!selectedCell) return new Set();
-        const cells = getWordCells(direction, selectedCell.row, selectedCell.col, PUZZLE.solution);
+        const cells = getWordCells(direction, selectedCell.row, selectedCell.col, puzzle.solution);
         return new Set(cells.map(c => `${c.row},${c.col}`));
-      }, [selectedCell, direction]);
+      }, [selectedCell, direction, puzzle]);
 
       const activeClue = useMemo(() => {
         if (!selectedCell) return null;
-        const clue = getActiveClue(direction, selectedCell.row, selectedCell.col, PUZZLE.clues, PUZZLE.solution);
+        const clue = getActiveClue(direction, selectedCell.row, selectedCell.col, puzzle.clues, puzzle.solution);
         return clue ? { ...clue, direction } : null;
-      }, [selectedCell, direction]);
+      }, [selectedCell, direction, puzzle]);
 
       function handleCellClick(row, col) {
-        if (PUZZLE.solution[row][col] === null) return;
+        if (puzzle.solution[row][col] === null) return;
+        if (alreadySolved) return;
         if (selectedCell && selectedCell.row === row && selectedCell.col === col) {
           const toggled = direction === 'across' ? 'down' : 'across';
-          setDirection(getValidDirection(toggled, row, col, PUZZLE.solution));
+          setDirection(getValidDirection(toggled, row, col, puzzle.solution));
         } else {
-          const validDir = getValidDirection(direction, row, col, PUZZLE.solution);
-          setDirection(validDir);
+          setDirection(getValidDirection(direction, row, col, puzzle.solution));
           setSelectedCell({ row, col });
         }
       }
 
-      function handleClueClick(dir, entry) {
-        setDirection(dir);
-        setSelectedCell({ row: entry.row, col: entry.col });
-      }
-
       function handleCheck() {
-        const newStates = PUZZLE.solution.map((row, r) =>
+        const newStates = puzzle.solution.map((row, r) =>
           row.map((cell, c) => {
             if (cell === null) return null;
             if (userGrid[r][c] === '') return null;
@@ -674,33 +642,73 @@
       }
 
       function handleReveal() {
-        const fullGrid = PUZZLE.solution.map(row => row.map(cell => (cell === null ? '' : cell)));
+        const fullGrid = puzzle.solution.map(row => row.map(cell => cell === null ? '' : cell));
         setUserGrid(fullGrid);
-        setCellStates(PUZZLE.solution.map(row => row.map(cell => (cell !== null ? 'correct' : null))));
+        setCellStates(puzzle.solution.map(row => row.map(cell => cell !== null ? 'correct' : null)));
         setRevealed(true);
         setShowRevealDialog(false);
       }
 
+      function handleShare() {
+        const time = formatTime(timerSeconds);
+        const date = formatDate(puzzle.dayIndex);
+        const text = `CrosswordSolver Mini\n${date}\nSolved in ${time} 🎉\n\nhttps://johanneinar.github.io/CrosswordSolver/`;
+        navigator.clipboard.writeText(text).then(() => {
+          setShareConfirm('Copied to clipboard!');
+          setTimeout(() => setShareConfirm(''), 3000);
+        });
+      }
+
+      const done = solved || revealed || alreadySolved;
+
       return (
         <div>
-          <Header timerSeconds={timerSeconds} timerStarted={timerStarted} solved={solved} onStatsClick={() => setShowStats(true)} />
+          <Header
+            timerSeconds={timerSeconds}
+            timerStarted={timerStarted}
+            solved={solved}
+            alreadySolved={alreadySolved}
+            dayIndex={puzzle.dayIndex}
+            dayOffset={dayOffset}
+            onPrev={() => setDayOffset(d => d - 1)}
+            onNext={() => setDayOffset(d => Math.min(d + 1, 0))}
+            onStatsClick={() => setShowStats(true)}
+          />
+          {alreadySolved && (
+            <div className="solved-banner">
+              <strong>Already solved!</strong> You completed this puzzle in {formatTime(timerSeconds)}.
+            </div>
+          )}
           <div className="puzzle-layout">
             <div className="grid-section">
               <div className="grid-wrap">
                 <Grid
-                  solution={PUZZLE.solution}
+                  solution={puzzle.solution}
                   userGrid={userGrid}
                   selectedCell={selectedCell}
                   highlightedCells={highlightedCells}
                   cellStates={cellStates}
+                  cellNumbers={cellNumbers}
                   onCellClick={handleCellClick}
                 />
-                <CompletionOverlay timerSeconds={timerSeconds} visible={solved} />
+                <CompletionOverlay timerSeconds={timerSeconds} visible={solved} dayIndex={puzzle.dayIndex} />
               </div>
-              <Controls onCheck={handleCheck} onReveal={() => setShowRevealDialog(true)} solved={solved} revealed={revealed} />
+              <Controls
+                onCheck={handleCheck}
+                onReveal={() => setShowRevealDialog(true)}
+                onShare={handleShare}
+                solved={solved}
+                revealed={revealed}
+                alreadySolved={alreadySolved}
+                shareConfirm={shareConfirm}
+              />
               <MobileKeyboard onKey={handleKey} />
             </div>
-            <ClueList clues={PUZZLE.clues} activeClue={activeClue} onClueClick={handleClueClick} />
+            <ClueList
+              clues={puzzle.clues}
+              activeClue={activeClue}
+              onClueClick={(dir, entry) => { setDirection(dir); setSelectedCell({ row: entry.row, col: entry.col }); }}
+            />
           </div>
           {showRevealDialog && <RevealDialog onConfirm={handleReveal} onCancel={() => setShowRevealDialog(false)} />}
           {showStats && <StatsModal onClose={() => setShowStats(false)} />}
