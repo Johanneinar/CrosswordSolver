@@ -11,10 +11,11 @@ A fully playable daily mini crossword puzzle, styled like *The New Yorker*. No a
 - **Daily puzzle** — a new 5×5 puzzle every day, rotating through the library
 - **Puzzle navigation** — use the ‹ › arrows to go back and replay previous days
 - **Already solved** — if you've solved today's puzzle, your time is shown when you return
-- **Check Puzzle** — marks correct cells green and wrong cells red
-- **Reveal Puzzle** — fills in all answers after a confirmation prompt
+- **Auto-advance** — cursor jumps to the next unsolved word automatically
+- **Check All / Check Word** — mark correct cells green and wrong cells red, for the full puzzle or just the active word
+- **Reveal All / Reveal Word** — fill in answers for the full puzzle (with confirmation) or just the active word
 - **Timer** — starts on your first keypress, freezes when you solve
-- **Completion animation** — a brief overlay fades in on solve
+- **Confetti** — brief celebration animation on solve
 - **Stats & streaks** — tracks total solves, current streak, and best time (📊 in the header)
 - **Share button** — copies your solve time and a link to the clipboard after completing
 - **Mobile keyboard** — QWERTY on-screen keyboard on small screens

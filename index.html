@@ -155,6 +155,17 @@
     .btn:disabled:hover { background: transparent; color: #1a1a1a; }
     .btn.btn-primary:disabled:hover { background: #1a1a1a; color: #f5f0e8; }
     .share-confirm { font-size: 12px; color: #2e7d32; font-style: italic; margin-top: 6px; }
+    .controls-secondary { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+    .btn-sm {
+      padding: 5px 12px;
+      font-family: 'Libre Baskerville', serif;
+      font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase;
+      border: 1px solid #888; background: transparent; color: #555;
+      cursor: pointer; transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+    .btn-sm:hover { border-color: #1a1a1a; color: #1a1a1a; }
+    .btn-sm:disabled { opacity: 0.3; cursor: default; }
+    .btn-sm:disabled:hover { border-color: #888; color: #555; }
 
     /* MOBILE KEYBOARD */
     .mobile-keyboard { display: none; margin-top: 16px; }
@@ -216,6 +227,19 @@
     .completion-time { font-size: 13px; color: #555; letter-spacing: 0.06em; margin-bottom: 14px; }
     .completion-rule { width: 40px; height: 1px; background: #1a1a1a; margin-bottom: 14px; }
     .completion-sub { font-size: 12px; color: #888; font-style: italic; }
+
+    /* CONFETTI */
+    .confetti-wrap {
+      position: fixed; inset: 0; pointer-events: none; z-index: 200; overflow: hidden;
+    }
+    .confetti-piece {
+      position: absolute; width: 8px; height: 8px;
+      animation: confetti-fall linear forwards;
+    }
+    @keyframes confetti-fall {
+      0%   { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+    }
 
     /* RESPONSIVE */
     @media (max-width: 639px) {
@@ -284,6 +308,29 @@
         for (let c = 0; c < 5; c++)
           if (solution[r][c] !== null && userGrid[r][c] !== solution[r][c]) return false;
       return true;
+    }
+
+    // Returns { cell, direction } for the first empty cell in the next unsolved word,
+    // cycling through all words in order after the current one.
+    function getNextWordTarget(curDir, curRow, curCol, puzzle, userGrid) {
+      const allWords = [
+        ...puzzle.clues.across.map(c => ({ ...c, direction: 'across' })),
+        ...puzzle.clues.down.map(c => ({ ...c, direction: 'down' })),
+      ].sort((a, b) => a.number - b.number || (a.direction === 'across' ? -1 : 1));
+
+      const wordCells = getWordCells(curDir, curRow, curCol, puzzle.solution);
+      if (!wordCells.length) return null;
+      const { row: r0, col: c0 } = wordCells[0];
+      const curIdx = allWords.findIndex(w => w.direction === curDir && w.row === r0 && w.col === c0);
+      if (curIdx === -1) return null;
+
+      for (let i = 1; i <= allWords.length; i++) {
+        const w = allWords[(curIdx + i) % allWords.length];
+        const cells = getWordCells(w.direction, w.row, w.col, puzzle.solution);
+        const empty = cells.find(c => userGrid[c.row][c.col] === '');
+        if (empty) return { cell: empty, direction: w.direction };
+      }
+      return null;
     }
 
     // ── STATS ────────────────────────────────────────────────────
@@ -391,14 +438,18 @@
       );
     }
 
-    function Controls({ onCheck, onReveal, onShare, solved, revealed, alreadySolved, shareConfirm }) {
+    function Controls({ onCheck, onCheckWord, onReveal, onRevealWord, onShare, solved, revealed, alreadySolved, shareConfirm }) {
       const done = solved || revealed || alreadySolved;
       return (
         <div>
           <div className="controls">
-            <button className="btn btn-primary" onClick={onCheck} disabled={done}>Check</button>
-            <button className="btn" onClick={onReveal} disabled={done}>Reveal</button>
+            <button className="btn btn-primary" onClick={onCheck} disabled={done}>Check All</button>
+            <button className="btn" onClick={onReveal} disabled={done}>Reveal All</button>
             {done && <button className="btn btn-share" onClick={onShare}>Share</button>}
+          </div>
+          <div className="controls-secondary">
+            <button className="btn-sm" onClick={onCheckWord} disabled={done}>Check Word</button>
+            <button className="btn-sm" onClick={onRevealWord} disabled={done}>Reveal Word</button>
           </div>
           {shareConfirm && <div className="share-confirm">{shareConfirm}</div>}
         </div>
@@ -474,6 +525,35 @@
       );
     }
 
+    function Confetti({ active }) {
+      const pieces = useMemo(() => {
+        if (!active) return [];
+        const colors = ['#d4a843','#1a1a1a','#c8e6c9','#dce8f5','#f5f0e8','#ffcdd2'];
+        return Array.from({ length: 60 }, (_, i) => ({
+          id: i,
+          left: Math.random() * 100,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          duration: 1.5 + Math.random() * 2,
+          delay: Math.random() * 0.8,
+          size: 6 + Math.random() * 6,
+        }));
+      }, [active]);
+      if (!active) return null;
+      return (
+        <div className="confetti-wrap">
+          {pieces.map(p => (
+            <div key={p.id} className="confetti-piece" style={{
+              left: `${p.left}%`,
+              background: p.color,
+              width: p.size, height: p.size,
+              animationDuration: `${p.duration}s`,
+              animationDelay: `${p.delay}s`,
+            }} />
+          ))}
+        </div>
+      );
+    }
+
     // ── APP ──────────────────────────────────────────────────────
 
     function App() {
@@ -503,6 +583,7 @@
       const [showRevealDialog, setShowRevealDialog] = useState(false);
       const [showStats, setShowStats] = useState(false);
       const [shareConfirm, setShareConfirm] = useState('');
+      const [confetti, setConfetti] = useState(false);
 
       // Reset state when puzzle changes (dayOffset changes)
       useEffect(() => {
@@ -516,6 +597,7 @@
         setRevealed(false);
         setAlreadySolved(false);
         setShareConfirm('');
+        setConfetti(false);
 
         // Check if already solved
         const stats = loadStats();
@@ -544,11 +626,18 @@
           setCellStates(newStates);
           if (checkSolved(newGrid, puzzle.solution)) {
             setSolved(true);
+            setConfetti(true);
+            setTimeout(() => setConfetti(false), 3000);
             recordSolve(puzzle.dayIndex, timerSeconds);
           }
           const wordCells = getWordCells(direction, row, col, puzzle.solution);
           const idx = wordCells.findIndex(c => c.row === row && c.col === col);
-          if (idx !== -1 && idx < wordCells.length - 1) setSelectedCell(wordCells[idx + 1]);
+          if (idx !== -1 && idx < wordCells.length - 1) {
+            setSelectedCell(wordCells[idx + 1]);
+          } else {
+            const next = getNextWordTarget(direction, row, col, puzzle, newGrid);
+            if (next) { setSelectedCell(next.cell); setDirection(next.direction); }
+          }
 
         } else if (key === 'Backspace') {
           if (!timerStarted) setTimerStarted(true);
@@ -641,6 +730,36 @@
         setCellStates(newStates);
       }
 
+      function handleCheckWord() {
+        if (!selectedCell) return;
+        const wordCells = getWordCells(direction, selectedCell.row, selectedCell.col, puzzle.solution);
+        const newStates = cellStates.map(r => [...r]);
+        wordCells.forEach(({ row, col }) => {
+          if (userGrid[row][col] !== '')
+            newStates[row][col] = userGrid[row][col] === puzzle.solution[row][col] ? 'correct' : 'wrong';
+        });
+        setCellStates(newStates);
+      }
+
+      function handleRevealWord() {
+        if (!selectedCell) return;
+        const wordCells = getWordCells(direction, selectedCell.row, selectedCell.col, puzzle.solution);
+        const newGrid = userGrid.map(r => [...r]);
+        const newStates = cellStates.map(r => [...r]);
+        wordCells.forEach(({ row, col }) => {
+          newGrid[row][col] = puzzle.solution[row][col];
+          newStates[row][col] = 'correct';
+        });
+        setUserGrid(newGrid);
+        setCellStates(newStates);
+        if (checkSolved(newGrid, puzzle.solution)) {
+          setSolved(true);
+          setConfetti(true);
+          setTimeout(() => setConfetti(false), 3000);
+          recordSolve(puzzle.dayIndex, timerSeconds);
+        }
+      }
+
       function handleReveal() {
         const fullGrid = puzzle.solution.map(row => row.map(cell => cell === null ? '' : cell));
         setUserGrid(fullGrid);
@@ -695,7 +814,9 @@
               </div>
               <Controls
                 onCheck={handleCheck}
+                onCheckWord={handleCheckWord}
                 onReveal={() => setShowRevealDialog(true)}
+                onRevealWord={handleRevealWord}
                 onShare={handleShare}
                 solved={solved}
                 revealed={revealed}
@@ -712,6 +833,7 @@
           </div>
           {showRevealDialog && <RevealDialog onConfirm={handleReveal} onCancel={() => setShowRevealDialog(false)} />}
           {showStats && <StatsModal onClose={() => setShowStats(false)} />}
+          <Confetti active={confetti} />
         </div>
       );
     }
