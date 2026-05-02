@@ -1,14 +1,23 @@
-# CrosswordSolver Mini
+# CrosswordSolver
 
-A fully playable daily mini crossword puzzle, styled like *The New Yorker*. No app, no login — just open the link.
+Two daily crossword puzzles styled like *The New Yorker* — a quick 5×5 Mini and a meatier 7×7 Midi. No app, no login — just open the link.
 
 **Play:** https://johanneinar.github.io/CrosswordSolver/
 
 ---
 
+## Two Sizes
+
+- **Mini · 5×5** — 6 clues, ~2 min. Quick daily fix.
+- **Midi · 7×7** — 8 clues, ~8 min. Bigger challenge with longer words.
+
+The home page lets you pick which to play. Each size has its own daily rotation, stats, and streak tracking.
+
+---
+
 ## Features
 
-- **Daily puzzle** — a new 5×5 puzzle every day, rotating through the library
+- **Daily puzzle** — a new 5×5 and 7×7 puzzle every day, rotating through the library
 - **Puzzle navigation** — use the ‹ › arrows to go back and replay previous days
 - **Already solved** — if you've solved today's puzzle, your time is shown when you return
 - **Auto-advance** — cursor jumps to the next unsolved word automatically
@@ -16,7 +25,7 @@ A fully playable daily mini crossword puzzle, styled like *The New Yorker*. No a
 - **Reveal All / Reveal Word** — fill in answers for the full puzzle (with confirmation) or just the active word
 - **Timer** — starts on your first keypress, freezes when you solve
 - **Confetti** — brief celebration animation on solve
-- **Stats & streaks** — tracks total solves, current streak, and best time (📊 in the header)
+- **Stats & streaks** — tracks total solves, current streak, and best time per size (📊 in the header)
 - **Share button** — copies your solve time and a link to the clipboard after completing
 - **Mobile keyboard** — QWERTY on-screen keyboard on small screens
 - **Responsive layout** — clues beside the grid on desktop, below on mobile
@@ -35,39 +44,27 @@ A fully playable daily mini crossword puzzle, styled like *The New Yorker*. No a
 
 ## Adding Puzzles
 
-Puzzles are stored in [`puzzles.js`](puzzles.js). Each entry follows this format:
+Mini puzzles live in [`puzzles-mini.js`](puzzles-mini.js); Midi puzzles in [`puzzles-midi.js`](puzzles-midi.js). Both arrays use the same format — only the grid size differs.
+
+**Mini format (5×5)** — black cells fixed at (1,1), (1,3), (3,1), (3,3); 3 across + 3 down, all 5-letter words.
+
+**Midi format (7×7)** — black cells fixed at every (odd_row, odd_col); 4 across + 4 down, all 7-letter words. 16 checked intersections to solve when constructing.
 
 ```js
 {
-  solution: [
-    ['W','O','R','D','S'],
-    ['A',null,'O',null,'T'],
-    ['T','E','N','T','H'],
-    ['E',null,'T',null,'I'],
-    ['R','E','A','D','S'],
-  ],
+  solution: [...],         // 2D array, null = black, letter = white
   clues: {
-    across: [
-      { number:1, row:0, col:0, len:5, clue:'Your clue here' },
-      { number:4, row:2, col:0, len:5, clue:'Your clue here' },
-      { number:5, row:4, col:0, len:5, clue:'Your clue here' },
-    ],
-    down: [
-      { number:1, row:0, col:0, len:5, clue:'Your clue here' },
-      { number:2, row:0, col:2, len:5, clue:'Your clue here' },
-      { number:3, row:0, col:4, len:5, clue:'Your clue here' },
-    ],
+    across: [{ number, row, col, len, clue }, ...],
+    down:   [{ number, row, col, len, clue }, ...],
   },
 }
 ```
 
-**Grid rules for this format:**
-- Black cells are `null`; white cells are the correct letter
-- Black cells are fixed at positions (row 1, col 1), (row 1, col 3), (row 3, col 1), (row 3, col 3)
-- 3 across words (rows 0, 2, 4) and 3 down words (cols 0, 2, 4)
-- Every intersection must match: `solution[row][col]` must be the same letter whether you read it across or down
-
-Use the **Puzzle Editor** to design new puzzles visually.
+**Grid rules:**
+- Every intersection must match: `solution[row][col]` is the same letter whether read across or down
+- Across word boundaries form on rows 0, 2, 4 (Mini) or 0, 2, 4, 6 (Midi)
+- Down word boundaries form on cols 0, 2, 4 (Mini) or 0, 2, 4, 6 (Midi)
+- Use the **Puzzle Editor** to design new puzzles visually
 
 ---
 
@@ -75,10 +72,24 @@ Use the **Puzzle Editor** to design new puzzles visually.
 
 https://johanneinar.github.io/CrosswordSolver/editor.html
 
+- Pick **Mini (5×5)** or **Midi (7×7)** at the top
 - Right-click cells to toggle them black
 - Type letters to fill in answers
 - Enter clues in the panel on the right
-- Click **Copy to Clipboard** — paste the JSON directly into the `PUZZLES` array in `puzzles.js`
+- Click **Copy to Clipboard** — paste the JSON directly into the matching `PUZZLES` array
+
+---
+
+## File Structure
+
+```
+index.html       # Selection screen — pick Mini or Midi
+mini.html        # 5×5 game
+midi.html        # 7×7 game
+editor.html      # Puzzle editor (supports both sizes)
+puzzles-mini.js  # Mini puzzle library
+puzzles-midi.js  # Midi puzzle library
+```
 
 ---
 
@@ -86,5 +97,5 @@ https://johanneinar.github.io/CrosswordSolver/editor.html
 
 - React 18 (UMD via unpkg) + Babel Standalone — no build step
 - Google Fonts: Playfair Display, Libre Baskerville
-- `localStorage` for stats and solved state
+- `localStorage` for stats and solved state (separate keys per size)
 - GitHub Pages for hosting

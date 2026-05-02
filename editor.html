@@ -73,12 +73,10 @@
     }
     .grid {
       display: grid;
-      grid-template-columns: repeat(5, 60px);
-      grid-template-rows: repeat(5, 60px);
       border: 2px solid #1a1a1a;
     }
     .cell {
-      width: 60px; height: 60px;
+      width: var(--cell-size, 60px); height: var(--cell-size, 60px);
       border: 1px solid #1a1a1a;
       background: #fff;
       position: relative;
@@ -117,6 +115,20 @@
     }
 
     .grid-controls { margin-top: 14px; display: flex; gap: 10px; align-items: center; }
+    .size-selector { display: flex; gap: 8px; margin-bottom: 16px; align-items: center; }
+    .size-label {
+      font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase;
+      color: #666; margin-right: 4px;
+    }
+    .size-btn {
+      padding: 5px 14px;
+      font-family: 'Libre Baskerville', serif;
+      font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase;
+      border: 1.5px solid #888; background: transparent; color: #555;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .size-btn:hover { border-color: #1a1a1a; color: #1a1a1a; }
+    .size-btn.active { background: #1a1a1a; border-color: #1a1a1a; color: #f5f0e8; }
     .hint-text { font-size: 12px; color: #666; font-style: italic; }
 
     /* CLUES */
@@ -242,15 +254,16 @@
     // Same word-detection logic as the game
     function getWordCells(direction, row, col, solution) {
       if (solution[row][col] === null) return [];
+      const sz = solution.length;
       const cells = [];
       if (direction === 'across') {
         let c = col;
         while (c > 0 && solution[row][c - 1] !== null) c--;
-        while (c < 5 && solution[row][c] !== null) { cells.push({ row, col: c }); c++; }
+        while (c < sz && solution[row][c] !== null) { cells.push({ row, col: c }); c++; }
       } else {
         let r = row;
         while (r > 0 && solution[r - 1][col] !== null) r--;
-        while (r < 5 && solution[r][col] !== null) { cells.push({ row: r, col }); r++; }
+        while (r < sz && solution[r][col] !== null) { cells.push({ row: r, col }); r++; }
       }
       return cells.length >= 2 ? cells : [];
     }
@@ -259,12 +272,13 @@
       const across = [], down = [];
       let number = 1;
       const numbered = {};
+      const sz = solution.length;
 
-      for (let r = 0; r < 5; r++) {
-        for (let c = 0; c < 5; c++) {
+      for (let r = 0; r < sz; r++) {
+        for (let c = 0; c < sz; c++) {
           if (solution[r][c] === null) continue;
-          const startsAcross = (c === 0 || solution[r][c-1] === null) && c < 4 && solution[r][c+1] !== null;
-          const startsDown   = (r === 0 || solution[r-1][c] === null) && r < 4 && solution[r+1][c] !== null;
+          const startsAcross = (c === 0 || solution[r][c-1] === null) && c < sz - 1 && solution[r][c+1] !== null;
+          const startsDown   = (r === 0 || solution[r-1][c] === null) && r < sz - 1 && solution[r+1][c] !== null;
           if (startsAcross || startsDown) {
             numbered[`${r},${c}`] = number;
             if (startsAcross) {
@@ -337,11 +351,23 @@
       );
     }
 
+    const CELL_SIZES = { 5: 60, 7: 46 };
+
     function App() {
+      const [size, setSize] = useState(5);
       const [grid, setGrid] = useState(() => Array(5).fill(null).map(() => Array(5).fill('')));
       const [selectedCell, setSelectedCell] = useState(null);
       const [clues, setClues] = useState({});
       const [copyMsg, setCopyMsg] = useState('');
+
+      function changeSize(newSize) {
+        if (newSize === size) return;
+        setSize(newSize);
+        setGrid(Array(newSize).fill(null).map(() => Array(newSize).fill('')));
+        setSelectedCell(null);
+        setClues({});
+        setCopyMsg('');
+      }
 
       // Build solution array (null for black, letter/'' for white)
       const solution = useMemo(() =>
@@ -368,7 +394,7 @@
       }
 
       function clearGrid() {
-        setGrid(Array(5).fill(null).map(() => Array(5).fill('')));
+        setGrid(Array(size).fill(null).map(() => Array(size).fill('')));
         setClues({});
       }
 
@@ -388,18 +414,30 @@
         });
       }
 
+      const cellSize = CELL_SIZES[size] || 60;
+      const gridStyle = {
+        gridTemplateColumns: `repeat(${size}, ${cellSize}px)`,
+        gridTemplateRows: `repeat(${size}, ${cellSize}px)`,
+        '--cell-size': `${cellSize}px`,
+      };
+
       return (
         <div>
           <header className="header">
-            <div className="header-eyebrow">CrosswordSolver</div>
+            <div className="header-eyebrow"><a href="index.html" style={{color:'#888',textDecoration:'none'}}>← All Puzzles</a>&nbsp;&nbsp;CrosswordSolver</div>
             <h1 className="header-title">Puzzle Editor</h1>
-            <div className="header-sub">Design a puzzle, then paste the exported JSON into puzzles.js</div>
+            <div className="header-sub">Design a puzzle, then paste the exported JSON into puzzles-mini.js or puzzles-midi.js</div>
           </header>
 
           <div className="editor-layout">
             <div className="grid-section">
+              <div className="size-selector">
+                <span className="size-label">Size:</span>
+                <button className={`size-btn${size === 5 ? ' active' : ''}`} onClick={() => changeSize(5)}>Mini · 5×5</button>
+                <button className={`size-btn${size === 7 ? ' active' : ''}`} onClick={() => changeSize(7)}>Midi · 7×7</button>
+              </div>
               <div className="grid-hint">Left-click a cell to select it. Right-click to toggle black.</div>
-              <div className="grid">
+              <div className="grid" style={gridStyle}>
                 {grid.map((row, r) =>
                   row.map((cell, c) => (
                     <EditorCell
@@ -467,7 +505,7 @@
           </div>
 
           <div className="export-section">
-            <div className="export-title">Export — paste into PUZZLES array in puzzles.js</div>
+            <div className="export-title">Export — paste into PUZZLES array in {size === 5 ? 'puzzles-mini.js' : 'puzzles-midi.js'}</div>
             <textarea className="export-area" readOnly value={exportJson} />
             <div className="export-actions">
               <button className="btn btn-primary" onClick={handleCopy}>Copy to Clipboard</button>
