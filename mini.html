@@ -17,6 +17,14 @@
       align-items: center;
       padding: 32px 16px 64px;
       color: #1a1a1a;
+      -webkit-tap-highlight-color: transparent;
+    }
+    button { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+    /* Off-screen input that captures hardware keyboard input on iOS/iPadOS without showing the soft keyboard */
+    .kb-capture {
+      position: fixed; left: -9999px; top: 0;
+      width: 1px; height: 1px; opacity: 0;
+      border: 0; padding: 0; pointer-events: none;
     }
 
     /* HEADER */
@@ -120,7 +128,7 @@
       position: relative;
       display: flex; align-items: center; justify-content: center;
       font-family: 'Playfair Display', serif;
-      font-size: 20px; font-weight: 700;
+      font-size: clamp(14px, calc(var(--cell-size, 58px) * 0.45), 22px); font-weight: 700;
       cursor: pointer; user-select: none;
     }
     .cell.black { background: #1a1a1a; cursor: default; }
@@ -165,19 +173,44 @@
     .btn-sm:disabled { opacity: 0.3; cursor: default; }
     .btn-sm:disabled:hover { border-color: #888; color: #555; }
 
+    /* ACTIVE CLUE BAR — desktop: inline above grid; mobile: fixed above keyboard */
+    .active-clue-bar {
+      display: flex; align-items: center; gap: 10px;
+      background: #fff7e1; border: 1.5px solid #1a1a1a;
+      padding: 8px 12px; margin-bottom: 14px;
+      font-size: 14px; line-height: 1.35;
+      max-width: 780px; width: 100%;
+      min-height: 44px;
+    }
+    .active-clue-bar .acb-tag {
+      font-family: 'Playfair Display', serif;
+      font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase;
+      font-weight: 700; flex-shrink: 0;
+      padding: 4px 8px; border: 1px solid #1a1a1a; background: #1a1a1a; color: #f5f0e8;
+    }
+    .active-clue-bar .acb-text { flex: 1; min-width: 0; }
+    .active-clue-bar .acb-nav {
+      background: none; border: 1.5px solid #1a1a1a; padding: 4px 10px;
+      font-size: 14px; line-height: 1; cursor: pointer; color: #1a1a1a;
+      flex-shrink: 0;
+    }
+    .active-clue-bar .acb-nav:disabled { opacity: 0.25; cursor: default; }
+    .active-clue-bar.empty { color: #888; font-style: italic; background: #f5f0e8; }
+
     /* MOBILE KEYBOARD */
-    .mobile-keyboard { display: none; margin-top: 16px; }
-    @media (max-width: 639px) { .mobile-keyboard { display: block; } }
+    .mobile-keyboard { display: none; }
     .kb-row { display: flex; justify-content: center; gap: 4px; margin-bottom: 4px; }
     .kb-key {
-      width: 30px; height: 40px;
+      flex: 1 1 0;
+      max-width: 36px; height: 44px;
       font-family: 'Libre Baskerville', serif;
-      font-size: 13px; font-weight: 700;
+      font-size: 14px; font-weight: 700;
       border: 1.5px solid #1a1a1a; background: #fff; cursor: pointer;
       transition: background 0.1s;
+      padding: 0;
     }
     .kb-key:active { background: #d4a843; }
-    .kb-wide { width: 64px; font-size: 16px; }
+    .kb-wide { max-width: 80px; font-size: 16px; }
 
     /* CLUES */
     .clues-section { flex: 1; min-width: 0; }
@@ -239,10 +272,43 @@
       100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
     }
 
+    /* MOBILE BOTTOM DOCK — clue bar + keyboard pinned together */
+    .mobile-bottom { display: none; }
+
     /* RESPONSIVE */
     @media (max-width: 639px) {
-      .puzzle-layout { flex-direction: column; align-items: center; }
-      .header-title { font-size: 32px; }
+      body { padding: 16px 10px 240px; }
+      .puzzle-layout { flex-direction: column; align-items: center; gap: 20px; }
+      .header { margin-bottom: 16px; padding-bottom: 12px; }
+      .header-title { font-size: 28px; margin-bottom: 6px; }
+      .header-eyebrow { font-size: 10px; margin-bottom: 6px; }
+      .grid-section { width: 100%; display: flex; flex-direction: column; align-items: center; }
+      .clues-section { width: 100%; }
+      .controls { justify-content: center; }
+
+      /* Hide the inline (above-grid) clue bar on mobile — the docked one shows above keyboard */
+      .active-clue-bar.inline-only { display: none; }
+
+      .mobile-bottom {
+        display: block;
+        position: fixed; left: 0; right: 0; bottom: 0;
+        background: #f5f0e8;
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+        z-index: 50;
+        border-top: 1.5px solid #1a1a1a;
+      }
+      .mobile-bottom .active-clue-bar {
+        margin: 0; border-left: none; border-right: none; border-top: none;
+        border-bottom: 1px solid #1a1a1a;
+      }
+      .mobile-keyboard { display: block; padding: 8px 6px; }
+      .kb-row { gap: 4px; }
+      .completion-overlay { padding: 12px; }
+      .completion-title { font-size: 24px; }
+    }
+    @media (max-width: 380px) {
+      .kb-key { height: 40px; font-size: 13px; }
+      .active-clue-bar { font-size: 13px; padding: 6px 10px; }
     }
   </style>
   <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
@@ -253,7 +319,7 @@
 <body>
   <div id="root"></div>
   <script type="text/babel">
-    const { useState, useEffect, useMemo, useCallback } = React;
+    const { useState, useEffect, useMemo, useCallback, useRef } = React;
 
     // ── HELPERS ──────────────────────────────────────────────────
 
@@ -378,10 +444,11 @@
     function Grid({ solution, userGrid, selectedCell, highlightedCells, cellStates, cellNumbers, onCellClick, cellSize }) {
       const sz = solution.length;
       const cs = cellSize || 58;
+      const responsive = `min(${cs}px, calc((100vw - 28px) / ${sz}))`;
       const gridStyle = {
-        gridTemplateColumns: `repeat(${sz}, ${cs}px)`,
-        gridTemplateRows: `repeat(${sz}, ${cs}px)`,
-        '--cell-size': `${cs}px`,
+        gridTemplateColumns: `repeat(${sz}, var(--cell-size))`,
+        gridTemplateRows: `repeat(${sz}, var(--cell-size))`,
+        '--cell-size': responsive,
       };
       return (
         <div className="grid" style={gridStyle} role="grid" aria-label="Crossword grid">
@@ -463,18 +530,37 @@
 
     function MobileKeyboard({ onKey }) {
       const rows = ['QWERTYUIOP', 'ASDFGHJKL', 'ZXCVBNM'];
+      const handle = (k) => (e) => { e.preventDefault(); onKey(k); };
       return (
         <div className="mobile-keyboard">
           {rows.map(row => (
             <div className="kb-row" key={row}>
               {row.split('').map(k => (
-                <button key={k} className="kb-key" onClick={() => onKey(k)}>{k}</button>
+                <button key={k} className="kb-key" onMouseDown={handle(k)} onTouchStart={handle(k)}>{k}</button>
               ))}
             </div>
           ))}
           <div className="kb-row">
-            <button className="kb-key kb-wide" onClick={() => onKey('Backspace')}>⌫</button>
+            <button className="kb-key kb-wide" onMouseDown={handle('Backspace')} onTouchStart={handle('Backspace')}>⌫</button>
           </div>
+        </div>
+      );
+    }
+
+    function ActiveClueBar({ activeClue, onPrev, onNext, extraClass }) {
+      const cls = 'active-clue-bar' + (extraClass ? ' ' + extraClass : '') + (!activeClue ? ' empty' : '');
+      return (
+        <div className={cls} role="status" aria-live="polite">
+          {activeClue ? (
+            <>
+              <button className="acb-nav" onClick={onPrev} aria-label="Previous clue">‹</button>
+              <span className="acb-tag">{activeClue.number} {activeClue.direction}</span>
+              <span className="acb-text">{activeClue.clue}</span>
+              <button className="acb-nav" onClick={onNext} aria-label="Next clue">›</button>
+            </>
+          ) : (
+            <span className="acb-text">Tap a square to start</span>
+          )}
         </div>
       );
     }
@@ -589,6 +675,13 @@
       const [showStats, setShowStats] = useState(false);
       const [shareConfirm, setShareConfirm] = useState('');
       const [confetti, setConfetti] = useState(false);
+      const kbCaptureRef = useRef(null);
+      const focusKbCapture = useCallback(() => {
+        const el = kbCaptureRef.current;
+        if (el && document.activeElement !== el) {
+          try { el.focus({ preventScroll: true }); } catch { el.focus(); }
+        }
+      }, []);
 
       // Reset state when puzzle changes (dayOffset changes)
       useEffect(() => {
@@ -722,6 +815,30 @@
           setDirection(getValidDirection(direction, row, col, puzzle.solution));
           setSelectedCell({ row, col });
         }
+        focusKbCapture();
+      }
+
+      function jumpToWord(dir, entry) {
+        setDirection(dir);
+        setSelectedCell({ row: entry.row, col: entry.col });
+        focusKbCapture();
+      }
+
+      function adjacentClue(delta) {
+        const all = [
+          ...puzzle.clues.across.map(c => ({ ...c, direction: 'across' })),
+          ...puzzle.clues.down.map(c => ({ ...c, direction: 'down' })),
+        ];
+        if (!all.length) return;
+        const cur = activeClue;
+        let idx = 0;
+        if (cur) {
+          idx = all.findIndex(w => w.direction === cur.direction && w.number === cur.number);
+          if (idx === -1) idx = 0;
+          idx = (idx + delta + all.length) % all.length;
+        }
+        const target = all[idx];
+        jumpToWord(target.direction, target);
       }
 
       function handleCheck() {
@@ -787,6 +904,18 @@
 
       return (
         <div>
+          <input
+            ref={kbCaptureRef}
+            className="kb-capture"
+            type="text"
+            readOnly
+            inputMode="none"
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
+            tabIndex={-1}
+            aria-hidden="true"
+          />
           <Header
             timerSeconds={timerSeconds}
             timerStarted={timerStarted}
@@ -803,6 +932,12 @@
               <strong>Already solved!</strong> You completed this puzzle in {formatTime(timerSeconds)}.
             </div>
           )}
+          <ActiveClueBar
+            activeClue={activeClue}
+            onPrev={() => adjacentClue(-1)}
+            onNext={() => adjacentClue(1)}
+            extraClass="inline-only"
+          />
           <div className="puzzle-layout">
             <div className="grid-section">
               <div className="grid-wrap">
@@ -829,13 +964,20 @@
                 alreadySolved={alreadySolved}
                 shareConfirm={shareConfirm}
               />
-              <MobileKeyboard onKey={handleKey} />
             </div>
             <ClueList
               clues={puzzle.clues}
               activeClue={activeClue}
-              onClueClick={(dir, entry) => { setDirection(dir); setSelectedCell({ row: entry.row, col: entry.col }); }}
+              onClueClick={jumpToWord}
             />
+          </div>
+          <div className="mobile-bottom">
+            <ActiveClueBar
+              activeClue={activeClue}
+              onPrev={() => adjacentClue(-1)}
+              onNext={() => adjacentClue(1)}
+            />
+            <MobileKeyboard onKey={handleKey} />
           </div>
           {showRevealDialog && <RevealDialog onConfirm={handleReveal} onCancel={() => setShowRevealDialog(false)} />}
           {showStats && <StatsModal onClose={() => setShowStats(false)} />}
