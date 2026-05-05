@@ -351,7 +351,81 @@
       );
     }
 
-    const CELL_SIZES = { 5: 60, 7: 46 };
+    const CELL_SIZES = { 5: 60, 7: 46, 15: 28 };
+
+    // .puz binary format parser. Format reference: https://code.google.com/archive/p/puz/wikis/FileFormat.wiki
+    function parsePuz(buffer) {
+      const view = new DataView(buffer);
+      const decoder = new TextDecoder('iso-8859-1');
+      const magicStart = 0x02;
+      const expectedMagic = 'ACROSS&DOWN\0';
+      const actualMagic = decoder.decode(new Uint8Array(buffer, magicStart, expectedMagic.length));
+      if (actualMagic !== expectedMagic) throw new Error('Not a valid .puz file (magic string mismatch)');
+
+      const width = view.getUint8(0x2C);
+      const height = view.getUint8(0x2D);
+      const numClues = view.getUint16(0x2E, true);
+
+      const solBytes = new Uint8Array(buffer, 0x34, width * height);
+      const solStr = decoder.decode(solBytes);
+
+      const solution = [];
+      for (let r = 0; r < height; r++) {
+        const row = [];
+        for (let c = 0; c < width; c++) {
+          const ch = solStr[r * width + c];
+          row.push(ch === '.' ? null : ch);
+        }
+        solution.push(row);
+      }
+
+      // Skip player state
+      let offset = 0x34 + 2 * width * height;
+
+      function readString() {
+        let end = offset;
+        while (end < buffer.byteLength && view.getUint8(end) !== 0) end++;
+        const str = decoder.decode(new Uint8Array(buffer, offset, end - offset));
+        offset = end + 1;
+        return str;
+      }
+
+      readString(); // title
+      readString(); // author
+      readString(); // copyright
+      const clueStrings = [];
+      for (let i = 0; i < numClues; i++) clueStrings.push(readString());
+
+      // Generate across/down by walking grid in reading order
+      const across = [];
+      const down = [];
+      let number = 1;
+      let clueIdx = 0;
+
+      for (let r = 0; r < height; r++) {
+        for (let c = 0; c < width; c++) {
+          if (solution[r][c] === null) continue;
+          const startsA = (c === 0 || solution[r][c-1] === null) && c < width-1 && solution[r][c+1] !== null;
+          const startsD = (r === 0 || solution[r-1][c] === null) && r < height-1 && solution[r+1][c] !== null;
+          if (startsA || startsD) {
+            if (startsA) {
+              let len = 0;
+              for (let cc = c; cc < width && solution[r][cc] !== null; cc++) len++;
+              across.push({ number, row: r, col: c, len, clue: clueStrings[clueIdx++] });
+            }
+            if (startsD) {
+              let len = 0;
+              for (let rr = r; rr < height && solution[rr][c] !== null; rr++) len++;
+              down.push({ number, row: r, col: c, len, clue: clueStrings[clueIdx++] });
+            }
+            number++;
+          }
+        }
+      }
+
+      return { solution, clues: { across, down } };
+    }
+
 
     function App() {
       const [size, setSize] = useState(5);
@@ -367,6 +441,42 @@
         setSelectedCell(null);
         setClues({});
         setCopyMsg('');
+      }
+
+      function handlePuzImport(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          try {
+            const parsed = parsePuz(ev.target.result);
+            const sz = parsed.solution.length;
+            // Width and height must match for our square-grid format
+            if (parsed.solution[0].length !== sz) {
+              alert(`Imported puzzle is ${parsed.solution[0].length}×${sz} — only square grids are supported.`);
+              return;
+            }
+            if (!CELL_SIZES[sz]) {
+              alert(`Imported puzzle is ${sz}×${sz}. Editor supports 5, 7, and 15. The grid will load but may not match an existing game size.`);
+            }
+            setSize(sz);
+            // Replace grid (use letter or null)
+            setGrid(parsed.solution);
+            // Populate clues
+            const newClues = {};
+            parsed.clues.across.forEach(c => { newClues[`across-${c.number}`] = c.clue; });
+            parsed.clues.down.forEach(c => { newClues[`down-${c.number}`] = c.clue; });
+            setClues(newClues);
+            setSelectedCell(null);
+            setCopyMsg(`Imported "${file.name}" (${sz}×${sz})`);
+            setTimeout(() => setCopyMsg(''), 4000);
+          } catch (err) {
+            alert(`Failed to parse .puz file: ${err.message}`);
+          }
+        };
+        reader.readAsArrayBuffer(file);
+        // Reset input so the same file can be re-imported
+        e.target.value = '';
       }
 
       // Build solution array (null for black, letter/'' for white)
@@ -435,6 +545,12 @@
                 <span className="size-label">Size:</span>
                 <button className={`size-btn${size === 5 ? ' active' : ''}`} onClick={() => changeSize(5)}>Mini · 5×5</button>
                 <button className={`size-btn${size === 7 ? ' active' : ''}`} onClick={() => changeSize(7)}>Midi · 7×7</button>
+                <button className={`size-btn${size === 15 ? ' active' : ''}`} onClick={() => changeSize(15)}>Daily · 15×15</button>
+                <span style={{flex:1}}></span>
+                <label className="btn-sm" style={{cursor:'pointer'}}>
+                  Import .puz
+                  <input type="file" accept=".puz" onChange={handlePuzImport} style={{display:'none'}} />
+                </label>
               </div>
               <div className="grid-hint">Left-click a cell to select it. Right-click to toggle black.</div>
               <div className="grid" style={gridStyle}>
@@ -505,7 +621,7 @@
           </div>
 
           <div className="export-section">
-            <div className="export-title">Export — paste into PUZZLES array in {size === 5 ? 'puzzles-mini.js' : 'puzzles-midi.js'}</div>
+            <div className="export-title">Export — paste into PUZZLES array in {size === 5 ? 'puzzles-mini.js' : size === 7 ? 'puzzles-midi.js' : 'puzzles-daily.js'}</div>
             <textarea className="export-area" readOnly value={exportJson} />
             <div className="export-actions">
               <button className="btn btn-primary" onClick={handleCopy}>Copy to Clipboard</button>

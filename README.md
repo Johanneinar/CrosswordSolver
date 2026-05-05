@@ -6,12 +6,13 @@ Two daily crossword puzzles styled like *The New Yorker* — a quick 5×5 Mini a
 
 ---
 
-## Two Sizes
+## Three Sizes
 
 - **Mini · 5×5** — 6 clues, ~2 min. Quick daily fix.
 - **Midi · 7×7** — 8 clues, ~8 min. Bigger challenge with longer words.
+- **Daily · 15×15** — ~60 clues, ~25 min. Full New Yorker / NYT-style daily.
 
-The home page lets you pick which to play. Each size has its own daily rotation, stats, and streak tracking.
+The home page lets you pick which to play. Each size has its own daily rotation, stats, and streak tracking. Daily puzzles can be added by importing `.puz` files via the editor.
 
 ---
 
@@ -72,23 +73,40 @@ Mini puzzles live in [`puzzles-mini.js`](puzzles-mini.js); Midi puzzles in [`puz
 
 https://johanneinar.github.io/CrosswordSolver/editor.html
 
-- Pick **Mini (5×5)** or **Midi (7×7)** at the top
+- Pick **Mini (5×5)**, **Midi (7×7)**, or **Daily (15×15)** at the top
 - Right-click cells to toggle them black
 - Type letters to fill in answers
 - Enter clues in the panel on the right
 - Click **Copy to Clipboard** — paste the JSON directly into the matching `PUZZLES` array
+
+### Importing `.puz` Files
+
+The editor has an **Import .puz** button that parses standard `.puz` crossword files (the format used by Across Lite and most crossword software). Useful for adding 15×15 Daily puzzles from public-domain sources.
+
+1. Click **Import .puz** in the editor toolbar
+2. Select a `.puz` file
+3. The grid, letters, and clues are loaded automatically
+4. Click **Copy to Clipboard** to get the JSON
+5. Paste into `puzzles-daily.js` (or `puzzles-mini.js` / `puzzles-midi.js` depending on size)
+
+Public-domain `.puz` sources include:
+- `crosswordnexus.com/puzzles` (some constructor archives are CC-licensed)
+- Constructor websites that release Creative Commons puzzles
+- `.puz` files in your own collection
 
 ---
 
 ## File Structure
 
 ```
-index.html       # Selection screen — pick Mini or Midi
+index.html       # Selection screen — pick Mini, Midi, or Daily
 mini.html        # 5×5 game
 midi.html        # 7×7 game
-editor.html      # Puzzle editor (supports both sizes)
+daily.html       # 15×15 game
+editor.html      # Puzzle editor (all sizes + .puz import)
 puzzles-mini.js  # Mini puzzle library
 puzzles-midi.js  # Midi puzzle library
+puzzles-daily.js # Daily puzzle library (populate via editor)
 ```
 
 ---
