@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Croosly — Daily Mini Crossword</title>
-  <meta name="description" content="A 5×5 crossword with six clues — about two minutes to solve. Croosly's Mini is a daily New York Times–style puzzle you can finish over your morning coffee.">
+  <title>Croosly — Mini Crossword</title>
+  <meta name="description" content="A 5×5 crossword with six clues — about two minutes to solve. Croosly's Mini is a New York Times–style puzzle you can finish over your morning coffee.">
   <link rel="canonical" href="https://croosly.com/mini.html">
   <meta name="theme-color" content="#1a1a1a">
 
@@ -15,16 +15,16 @@
 
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Croosly">
-  <meta property="og:title" content="Croosly — Daily Mini Crossword">
-  <meta property="og:description" content="A 5×5 crossword with six clues — about two minutes to solve. Croosly's Mini is a daily New York Times–style puzzle you can finish over your morning coffee.">
+  <meta property="og:title" content="Croosly — Mini Crossword">
+  <meta property="og:description" content="A 5×5 crossword with six clues — about two minutes to solve. Croosly's Mini is a New York Times–style puzzle you can finish over your morning coffee.">
   <meta property="og:url" content="https://croosly.com/mini.html">
   <meta property="og:image" content="https://croosly.com/og-image.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
 
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Croosly — Daily Mini Crossword">
-  <meta name="twitter:description" content="A 5×5 crossword with six clues — about two minutes to solve. Croosly's Mini is a daily New York Times–style puzzle you can finish over your morning coffee.">
+  <meta name="twitter:title" content="Croosly — Mini Crossword">
+  <meta name="twitter:description" content="A 5×5 crossword with six clues — about two minutes to solve. Croosly's Mini is a New York Times–style puzzle you can finish over your morning coffee.">
   <meta name="twitter:image" content="https://croosly.com/og-image.png">
 
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -260,6 +260,25 @@
     .kb-wide { max-width: 84px; font-size: 16px; background: #f5f0e8; }
     .kb-backspace { max-width: 56px; background: #f5f0e8; font-size: 16px; }
 
+    /* PUZZLE PICKER */
+    .puzzle-picker {
+      display: flex; flex-wrap: wrap; gap: 6px; justify-content: center;
+      max-width: 780px; width: 100%;
+      margin: 0 auto 20px; padding: 0 8px;
+    }
+    .pp-chip {
+      font-family: 'Libre Baskerville', serif;
+      font-size: 13px; font-weight: 400;
+      padding: 6px 10px; min-width: 38px;
+      border: 1px solid #c9bfa8; background: #fff; color: #1a1a1a;
+      cursor: pointer; border-radius: 4px;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+    }
+    .pp-chip:hover { border-color: #1a1a1a; }
+    .pp-chip.solved { border-color: #2e7d32; color: #2e7d32; }
+    .pp-chip.active { background: #f3c969; border-color: #c08e1f; color: #1a1a1a; }
+    .pp-chip.solved.active { background: #f3c969; border-color: #c08e1f; color: #1a1a1a; }
+
     /* CLUES */
     .clues-section { flex: 1; min-width: 0; }
     .clue-group { margin-bottom: 24px; }
@@ -400,12 +419,6 @@
       return `${m}:${s.toString().padStart(2, '0')}`;
     }
 
-    function formatDate(dayIndex) {
-      const d = new Date(EPOCH);
-      d.setDate(d.getDate() + dayIndex);
-      return d.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-    }
-
     function getWordCells(direction, row, col, solution) {
       if (solution[row][col] === null) return [];
       const cells = [];
@@ -470,27 +483,31 @@
 
     // ── STATS ────────────────────────────────────────────────────
 
+    const STATS_KEY = 'croosly-mini-stats';
+
     function loadStats() {
       try {
-        return JSON.parse(localStorage.getItem('crossword-mini-stats')) ||
-          { solves: [], bestTime: null, streak: 0, lastSolveDate: null, solvedDays: {} };
+        return JSON.parse(localStorage.getItem(STATS_KEY)) ||
+          { solvedPuzzles: {}, bestTime: null };
       } catch {
-        return { solves: [], bestTime: null, streak: 0, lastSolveDate: null, solvedDays: {} };
+        return { solvedPuzzles: {}, bestTime: null };
       }
     }
 
-    function recordSolve(dayIndex, timeSeconds) {
-      const today = new Date().toISOString().slice(0, 10);
+    function recordSolve(puzzleIndex, timeSeconds) {
       const stats = loadStats();
-      if (!stats.solvedDays) stats.solvedDays = {};
-      if (stats.solvedDays[dayIndex] !== undefined) return; // already recorded
-      const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
-      stats.solves.push({ date: today, time: timeSeconds });
+      if (!stats.solvedPuzzles) stats.solvedPuzzles = {};
+      if (stats.solvedPuzzles[puzzleIndex] !== undefined) return;
+      stats.solvedPuzzles[puzzleIndex] = timeSeconds;
       stats.bestTime = stats.bestTime === null ? timeSeconds : Math.min(stats.bestTime, timeSeconds);
-      stats.streak = stats.lastSolveDate === yesterday ? (stats.streak || 0) + 1 : 1;
-      stats.lastSolveDate = today;
-      stats.solvedDays[dayIndex] = timeSeconds;
-      localStorage.setItem('crossword-mini-stats', JSON.stringify(stats));
+      localStorage.setItem(STATS_KEY, JSON.stringify(stats));
+    }
+
+    function getInitialPuzzleIndex(count) {
+      const stats = loadStats();
+      const solved = stats.solvedPuzzles || {};
+      for (let i = 0; i < count; i++) if (solved[i] === undefined) return i;
+      return 0;
     }
 
     // ── COMPONENTS ───────────────────────────────────────────────
@@ -539,18 +556,16 @@
       );
     }
 
-    function Header({ timerSeconds, timerStarted, solved, alreadySolved, dayIndex, dayOffset, onPrev, onNext, onStatsClick }) {
+    function Header({ timerSeconds, timerStarted, solved, alreadySolved, puzzleIndex, puzzleCount, onPrev, onNext, onStatsClick }) {
       const time = (timerStarted || solved || alreadySolved) ? formatTime(timerSeconds) : '0:00';
-      const today = new Date(); today.setHours(0,0,0,0);
-      const currentDayIndex = Math.floor((today - EPOCH) / 86400000);
       return (
         <header className="header">
-          <div className="header-eyebrow"><a href="index.html" style={{color:'#888',textDecoration:'none',fontSize:'11px',letterSpacing:'0.1em'}}>← All Puzzles</a>&nbsp;&nbsp;The Daily Crossword</div>
+          <div className="header-eyebrow"><a href="index.html" style={{color:'#888',textDecoration:'none',fontSize:'11px',letterSpacing:'0.1em'}}>← All Puzzles</a></div>
           <h1 className="header-title">Mini Crossword</h1>
           <div className="header-nav">
-            <button className="nav-btn" onClick={onPrev} aria-label="Previous puzzle">‹</button>
-            <span className="header-dateline">{formatDate(dayIndex)}</span>
-            <button className="nav-btn" onClick={onNext} disabled={dayOffset >= 0} aria-label="Next puzzle">›</button>
+            <button className="nav-btn" onClick={onPrev} disabled={puzzleIndex <= 0} aria-label="Previous puzzle">‹</button>
+            <span className="header-dateline">Puzzle #{puzzleIndex + 1}</span>
+            <button className="nav-btn" onClick={onNext} disabled={puzzleIndex >= puzzleCount - 1} aria-label="Next puzzle">›</button>
           </div>
           <div className="header-meta">
             <span className="header-timer">{time}</span>
@@ -641,15 +656,15 @@
       );
     }
 
-    function StatsModal({ onClose }) {
+    function StatsModal({ onClose, puzzleCount }) {
       const stats = loadStats();
+      const solvedCount = Object.keys(stats.solvedPuzzles || {}).length;
       return (
         <div className="dialog-backdrop" onClick={onClose}>
           <div className="dialog-card" onClick={e => e.stopPropagation()}>
             <div className="dialog-title">Your Stats</div>
             <div className="stats-grid">
-              <div className="stat"><span className="stat-num">{stats.solves.length}</span><span className="stat-label">Solved</span></div>
-              <div className="stat"><span className="stat-num">{stats.streak}</span><span className="stat-label">Streak</span></div>
+              <div className="stat"><span className="stat-num">{solvedCount}/{puzzleCount}</span><span className="stat-label">Solved</span></div>
               <div className="stat"><span className="stat-num">{stats.bestTime !== null ? formatTime(stats.bestTime) : '—'}</span><span className="stat-label">Best</span></div>
             </div>
             <p className="stats-disclaimer">Stats are stored in your browser. They won't sync across devices and may be cleared if you clear browsing data.</p>
@@ -674,7 +689,7 @@
       );
     }
 
-    function CompletionOverlay({ timerSeconds, visible, dayIndex }) {
+    function CompletionOverlay({ timerSeconds, visible, puzzleIndex }) {
       const [opacity, setOpacity] = useState(0);
       useEffect(() => {
         if (!visible) { setOpacity(0); return; }
@@ -688,7 +703,24 @@
           <div className="completion-title">Solved!</div>
           <div className="completion-time">{formatTime(timerSeconds)}</div>
           <div className="completion-rule" />
-          <div className="completion-sub">{formatDate(dayIndex)}</div>
+          <div className="completion-sub">Puzzle #{puzzleIndex + 1}</div>
+        </div>
+      );
+    }
+
+    function PuzzlePicker({ count, currentIndex, solvedSet, onPick }) {
+      return (
+        <div className="puzzle-picker" role="tablist" aria-label="Choose puzzle">
+          {Array.from({ length: count }, (_, i) => {
+            const cls = 'pp-chip'
+              + (i === currentIndex ? ' active' : '')
+              + (solvedSet.has(i) ? ' solved' : '');
+            return (
+              <button key={i} type="button" className={cls} onClick={() => onPick(i)} aria-current={i === currentIndex ? 'true' : undefined} aria-label={`Puzzle ${i + 1}${solvedSet.has(i) ? ' (solved)' : ''}`}>
+                {solvedSet.has(i) ? `✓${i + 1}` : i + 1}
+              </button>
+            );
+          })}
         </div>
       );
     }
@@ -725,8 +757,8 @@
     // ── APP ──────────────────────────────────────────────────────
 
     function App() {
-      const [dayOffset, setDayOffset] = useState(0);
-      const puzzle = useMemo(() => getPuzzleForDay(dayOffset), [dayOffset]);
+      const [puzzleIndex, setPuzzleIndex] = useState(() => getInitialPuzzleIndex(PUZZLES.length));
+      const puzzle = useMemo(() => getPuzzleByIndex(puzzleIndex), [puzzleIndex]);
 
       const cellNumbers = useMemo(() => {
         const map = {};
@@ -760,7 +792,7 @@
         }
       }, []);
 
-      // Reset state when puzzle changes (dayOffset changes)
+      // Reset state when puzzle changes (puzzleIndex changes)
       useEffect(() => {
         setUserGrid(emptyGrid());
         setCellStates(emptyStates());
@@ -776,7 +808,7 @@
 
         // Check if already solved
         const stats = loadStats();
-        const savedTime = stats.solvedDays && stats.solvedDays[puzzle.dayIndex];
+        const savedTime = stats.solvedPuzzles && stats.solvedPuzzles[puzzle.puzzleIndex];
         if (savedTime !== undefined) {
           setAlreadySolved(true);
           setTimerSeconds(savedTime);
@@ -784,7 +816,7 @@
           setUserGrid(filledGrid);
           setCellStates(puzzle.solution.map(row => row.map(cell => cell !== null ? 'correct' : null)));
         }
-      }, [puzzle.dayIndex]);
+      }, [puzzle.puzzleIndex]);
 
       const handleKey = useCallback((key) => {
         if (!selectedCell || solved || revealed || alreadySolved) return;
@@ -803,7 +835,7 @@
             setSolved(true);
             setConfetti(true);
             setTimeout(() => setConfetti(false), 3000);
-            recordSolve(puzzle.dayIndex, timerSeconds);
+            recordSolve(puzzle.puzzleIndex, timerSeconds);
           }
           const wordCells = getWordCells(direction, row, col, puzzle.solution);
           const idx = wordCells.findIndex(c => c.row === row && c.col === col);
@@ -975,7 +1007,7 @@
           setSolved(true);
           setConfetti(true);
           setTimeout(() => setConfetti(false), 3000);
-          recordSolve(puzzle.dayIndex, timerSeconds);
+          recordSolve(puzzle.puzzleIndex, timerSeconds);
         }
       }
 
@@ -989,8 +1021,7 @@
 
       function handleShare() {
         const time = formatTime(timerSeconds);
-        const date = formatDate(puzzle.dayIndex);
-        const text = `Croosly Mini\n${date}\nSolved in ${time} 🎉\n\nhttps://croosly.com/mini.html`;
+        const text = `Croosly Mini #${puzzle.puzzleIndex + 1}\nSolved in ${time} 🎉\n\nhttps://croosly.com/mini.html`;
         navigator.clipboard.writeText(text).then(() => {
           setShareConfirm('Copied to clipboard!');
           setTimeout(() => setShareConfirm(''), 3000);
@@ -1018,11 +1049,17 @@
             timerStarted={timerStarted}
             solved={solved}
             alreadySolved={alreadySolved}
-            dayIndex={puzzle.dayIndex}
-            dayOffset={dayOffset}
-            onPrev={() => setDayOffset(d => d - 1)}
-            onNext={() => setDayOffset(d => Math.min(d + 1, 0))}
+            puzzleIndex={puzzle.puzzleIndex}
+            puzzleCount={PUZZLES.length}
+            onPrev={() => setPuzzleIndex(i => Math.max(0, i - 1))}
+            onNext={() => setPuzzleIndex(i => Math.min(PUZZLES.length - 1, i + 1))}
             onStatsClick={() => setShowStats(true)}
+          />
+          <PuzzlePicker
+            count={PUZZLES.length}
+            currentIndex={puzzle.puzzleIndex}
+            solvedSet={new Set(Object.keys(loadStats().solvedPuzzles || {}).map(Number))}
+            onPick={setPuzzleIndex}
           />
           {alreadySolved && (
             <div className="solved-banner">
@@ -1049,7 +1086,7 @@
                   onCellClick={handleCellClick}
                   cellSize={58}
                 />
-                <CompletionOverlay timerSeconds={timerSeconds} visible={solved} dayIndex={puzzle.dayIndex} />
+                <CompletionOverlay timerSeconds={timerSeconds} visible={solved} puzzleIndex={puzzle.puzzleIndex} />
               </div>
               <Controls
                 onCheck={handleCheck}
@@ -1079,7 +1116,7 @@
             <MobileKeyboard onKey={handleKey} />
           </div>
           {showRevealDialog && <RevealDialog onConfirm={handleReveal} onCancel={() => setShowRevealDialog(false)} />}
-          {showStats && <StatsModal onClose={() => setShowStats(false)} />}
+          {showStats && <StatsModal onClose={() => setShowStats(false)} puzzleCount={PUZZLES.length} />}
           <Confetti active={confetti} />
         </div>
       );

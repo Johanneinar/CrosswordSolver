@@ -1,6 +1,6 @@
 # Croosly
 
-Croosly — daily Mini and Midi crosswords inspired by *The New York Times*. Free, no signup, no app.
+Croosly — Mini and Midi crosswords inspired by *The New York Times*. Free, no signup, no app.
 
 **Play:** https://croosly.com/
 
@@ -8,25 +8,25 @@ Croosly — daily Mini and Midi crosswords inspired by *The New York Times*. Fre
 
 ## Three Sizes
 
-- **Mini · 5×5** — 6 clues, ~2 min. Quick daily fix.
+- **Mini · 5×5** — 6 clues, ~2 min. Quick warm-up.
 - **Midi · 7×7** — 8 clues, ~8 min. Bigger challenge with longer words.
 - **Daily · 15×15** — ~60-78 clues, ~25 min. Full NYT-style daily. (Seeded with 2 algorithmically-generated puzzles; expand by importing `.puz` files.)
 
-The home page lets you pick which to play. Each size has its own daily rotation, stats, and streak tracking. Daily puzzles can be added by importing `.puz` files via the editor.
+The home page lets you pick which to play. Each size has its own numbered set of puzzles and tracks which you've solved plus your best time. Daily-size puzzles can be added by importing `.puz` files via the editor.
 
 ---
 
 ## Features
 
-- **Daily puzzle** — a new 5×5 and 7×7 puzzle every day, rotating through the library
-- **Puzzle navigation** — use the ‹ › arrows to go back and replay previous days
-- **Already solved** — if you've solved today's puzzle, your time is shown when you return
-- **Auto-advance** — cursor jumps to the next unsolved word automatically
+- **Numbered puzzle set** — 10 hand-picked puzzles each in Mini and Midi; pick any with the chip picker or the ‹ › arrows
+- **Auto-resume** — opens to your first unsolved puzzle on each visit
+- **Already solved** — if you've solved a puzzle, your time is shown when you return to it
+- **Auto-advance** — cursor jumps to the next unsolved word, skipping cells already filled in
 - **Check All / Check Word** — mark correct cells green and wrong cells red, for the full puzzle or just the active word
 - **Reveal All / Reveal Word** — fill in answers for the full puzzle (with confirmation) or just the active word
 - **Timer** — starts on your first keypress, freezes when you solve
 - **Confetti** — brief celebration animation on solve
-- **Stats & streaks** — tracks total solves, current streak, and best time per size (📊 in the header)
+- **Stats** — tracks how many puzzles you've solved and your best time per size (📊 in the header)
 - **Share button** — copies your solve time and a link to the clipboard after completing
 - **Mobile keyboard** — QWERTY on-screen keyboard on small screens
 - **Responsive layout** — clues beside the grid on desktop, below on mobile

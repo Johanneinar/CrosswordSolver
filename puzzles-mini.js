@@ -211,12 +211,7 @@ const PUZZLES = [
   },
 ];
 
-const EPOCH = new Date('2026-05-01');
-
-function getPuzzleForDay(dayOffset) {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const days = Math.floor((today - EPOCH) / 86400000) + (dayOffset || 0);
-  const idx = ((days % PUZZLES.length) + PUZZLES.length) % PUZZLES.length;
-  return { ...PUZZLES[idx], dayIndex: days };
+function getPuzzleByIndex(i) {
+  const idx = Math.max(0, Math.min(PUZZLES.length - 1, i | 0));
+  return { ...PUZZLES[idx], puzzleIndex: idx };
 }
