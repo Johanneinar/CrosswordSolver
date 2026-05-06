@@ -1,6 +1,6 @@
 # Croosly
 
-Croosly — daily Mini and Midi crosswords inspired by *The New Yorker*. Free, no signup, no app.
+Croosly — daily Mini and Midi crosswords inspired by *The New York Times*. Free, no signup, no app.
 
 **Play:** https://croosly.com/
 
@@ -10,7 +10,7 @@ Croosly — daily Mini and Midi crosswords inspired by *The New Yorker*. Free, n
 
 - **Mini · 5×5** — 6 clues, ~2 min. Quick daily fix.
 - **Midi · 7×7** — 8 clues, ~8 min. Bigger challenge with longer words.
-- **Daily · 15×15** — ~60-78 clues, ~25 min. Full New Yorker / NYT-style daily. (Seeded with 2 algorithmically-generated puzzles; expand by importing `.puz` files.)
+- **Daily · 15×15** — ~60-78 clues, ~25 min. Full NYT-style daily. (Seeded with 2 algorithmically-generated puzzles; expand by importing `.puz` files.)
 
 The home page lets you pick which to play. Each size has its own daily rotation, stats, and streak tracking. Daily puzzles can be added by importing `.puz` files via the editor.
 

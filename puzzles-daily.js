@@ -1,4 +1,4 @@
-// 15×15 daily crossword puzzles, New Yorker / NYT-style format.
+// 15×15 daily crossword puzzles, NYT-style format.
 // These were generated algorithmically from a public-domain grid pattern + macOS wordlist
 // + WordNet definitions. Quality varies — some clues are placeholder ("N-letter word").
 // Use the editor's "Import .puz" button to add hand-curated puzzles.

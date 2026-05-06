@@ -32,7 +32,7 @@ Search and replace "CrosswordSolver" with "Croosly" across all files:
 
 Update the README to reflect the new positioning. Drop language about
 the project being a "solver" — it's a player. New short description:
-"Croosly — daily Mini and Midi crosswords inspired by The New Yorker.
+"Croosly — daily Mini and Midi crosswords inspired by The New York Times.
 Free, no signup, no app."
 
 After this stage, show me the diff of every changed file and wait for
@@ -89,7 +89,7 @@ Add a small footer to index.html, mini.html, midi.html:
 - Link to a new /about.html page (create this — keep it short, ~150
   words, first-person, mentions it started as a project for my girlfriend,
   describes Croosly as "a daily mini and midi crossword inspired by
-  The New Yorker")
+  The New York Times")
 - Link to a new /privacy.html page (create this — explain that stats
   are stored in localStorage on the user's browser, no tracking, no
   third-party services beyond Google Fonts and the React CDN, contact
