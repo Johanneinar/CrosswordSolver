@@ -286,6 +286,7 @@
     .stat { display: flex; flex-direction: column; align-items: center; gap: 4px; }
     .stat-num { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 700; }
     .stat-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #666; }
+    .stats-disclaimer { font-size: 11px; color: #888; font-style: italic; line-height: 1.5; margin: -12px 0 20px; }
 
     /* COMPLETION OVERLAY */
     .completion-overlay {
@@ -640,6 +641,7 @@
               <div className="stat"><span className="stat-num">{stats.streak}</span><span className="stat-label">Streak</span></div>
               <div className="stat"><span className="stat-num">{stats.bestTime !== null ? formatTime(stats.bestTime) : '—'}</span><span className="stat-label">Best</span></div>
             </div>
+            <p className="stats-disclaimer">Stats are stored in your browser. They won't sync across devices and may be cleared if you clear browsing data.</p>
             <div className="dialog-buttons"><button className="btn btn-primary" onClick={onClose}>Done</button></div>
           </div>
         </div>
