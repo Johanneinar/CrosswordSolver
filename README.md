@@ -2,7 +2,7 @@
 
 Croosly — daily Mini and Midi crosswords inspired by *The New Yorker*. Free, no signup, no app.
 
-**Play:** https://johanneinar.github.io/CrosswordSolver/
+**Play:** https://croosly.com/
 
 ---
 
@@ -36,10 +36,11 @@ The home page lets you pick which to play. Each size has its own daily rotation,
 ## How to Play
 
 - **Click** a white cell to select it; click again to toggle across/down
-- **Type** to fill in letters — the cursor advances automatically
+- **Type** to fill in letters — the cursor advances, skipping any cell already filled in; once the word is complete it jumps to the next unsolved word
 - **Backspace** to erase
 - **Arrow keys** to navigate
 - **Click a clue** to jump to that word
+- **Mobile**: tap the clue bar above the keyboard to switch between across/down at the selected cell
 
 ---
 
@@ -71,7 +72,7 @@ Mini puzzles live in [`puzzles-mini.js`](puzzles-mini.js); Midi puzzles in [`puz
 
 ## Puzzle Editor
 
-https://johanneinar.github.io/CrosswordSolver/editor.html
+https://croosly.com/editor.html
 
 - Pick **Mini (5×5)**, **Midi (7×7)**, or **Daily (15×15)** at the top
 - Right-click cells to toggle them black
