@@ -395,8 +395,8 @@
     .site-footer a:hover { color: #1a1a1a; border-bottom-color: #1a1a1a; }
     @media (max-width: 639px) { .site-footer { display: none; } }
   </style>
-  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <script src="puzzles-mini.js"></script>
 </head>
@@ -520,9 +520,8 @@
       if (cellState === 'correct') className += ' correct';
       if (cellState === 'wrong') className += ' wrong';
       return (
-        <div className={className} onClick={onClick} role="gridcell" tabIndex={0}
-          aria-selected={isSelected}
-          aria-label={`Row ${row + 1}, column ${col + 1}${letter ? ', letter ' + letter : ''}`}>
+        <div className={className} onClick={onClick} role="button" tabIndex={0}
+          aria-label={`${number ? number + ', ' : ''}row ${row + 1}, column ${col + 1}${letter ? ', letter ' + letter : ''}`}>
           {number && <span className="cell-number">{number}</span>}
           {letter}
         </div>
@@ -539,7 +538,7 @@
         '--cell-size': responsive,
       };
       return (
-        <div className="grid" style={gridStyle} role="grid" aria-label="Crossword grid">
+        <div className="grid" style={gridStyle} aria-label="Crossword grid">
           {solution.map((row, r) =>
             row.map((cell, c) => (
               <Cell key={`${r},${c}`} row={r} col={c}
@@ -560,7 +559,7 @@
       const time = (timerStarted || solved || alreadySolved) ? formatTime(timerSeconds) : '0:00';
       return (
         <header className="header">
-          <div className="header-eyebrow"><a href="index.html" style={{color:'#888',textDecoration:'none',fontSize:'11px',letterSpacing:'0.1em'}}>← All Puzzles</a></div>
+          <div className="header-eyebrow"><a href="index.html" style={{color:'#666',textDecoration:'none',fontSize:'11px',letterSpacing:'0.1em'}}>← All Puzzles</a></div>
           <h1 className="header-title">Mini Crossword</h1>
           <div className="header-nav">
             <button className="nav-btn" onClick={onPrev} disabled={puzzleIndex <= 0} aria-label="Previous puzzle">‹</button>
@@ -710,7 +709,7 @@
 
     function PuzzlePicker({ count, currentIndex, solvedSet, onPick }) {
       return (
-        <div className="puzzle-picker" role="tablist" aria-label="Choose puzzle">
+        <div className="puzzle-picker" aria-label="Choose puzzle">
           {Array.from({ length: count }, (_, i) => {
             const cls = 'pp-chip'
               + (i === currentIndex ? ' active' : '')
@@ -1031,7 +1030,7 @@
       const done = solved || revealed || alreadySolved;
 
       return (
-        <div>
+        <main>
           <input
             ref={kbCaptureRef}
             className="kb-capture"
@@ -1118,7 +1117,7 @@
           {showRevealDialog && <RevealDialog onConfirm={handleReveal} onCancel={() => setShowRevealDialog(false)} />}
           {showStats && <StatsModal onClose={() => setShowStats(false)} puzzleCount={PUZZLES.length} />}
           <Confetti active={confetti} />
-        </div>
+        </main>
       );
     }
 
