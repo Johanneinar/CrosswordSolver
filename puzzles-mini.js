@@ -23,9 +23,9 @@ const PUZZLES = [
   {
     solution: [
       ['S','N','A','R','E'],
-      ['P',null,'G',null,'Q'],
+      ['P',null,'G',null,'M'],
       ['L','L','A','M','A'],
-      ['I',null,'I',null,'U'],
+      ['I',null,'I',null,'I'],
       ['T','O','N','A','L'],
     ],
     clues: {
@@ -37,7 +37,7 @@ const PUZZLES = [
       down: [
         { number:1, row:0, col:0, len:5, clue:'Banana ___' },
         { number:2, row:0, col:2, len:5, clue:'Once more' },
-        { number:3, row:0, col:4, len:5, clue:'On par' },
+        { number:3, row:0, col:4, len:5, clue:'Inbox message' },
       ],
     },
   },
