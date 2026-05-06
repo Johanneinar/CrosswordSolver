@@ -171,38 +171,7 @@
       </div>
     </a>
 
-    <a class="card" href="daily.html">
-      <div class="card-size">Daily · 15×15</div>
-      <div class="card-title">Daily</div>
-      <!-- 15x15 grid preview generated at page load -->
-      <div class="card-grid daily" id="daily-grid-preview"></div>
-      <div class="card-meta">
-        ~60 clues · ~25 min<br>
-        Import from .puz files
-      </div>
-    </a>
-
   </div>
-
-  <script>
-    // Generate a 15x15 preview with a representative black-cell pattern (180° symmetric)
-    (function() {
-      const blacks = new Set([
-        '0,3','0,11', '1,3','1,11', '2,3','2,11', '3,0','3,1','3,7','3,13','3,14',
-        '4,5','4,9', '5,4','5,8','5,12', '6,2','6,6','6,10', '7,7',
-        '8,4','8,8','8,12', '9,2','9,6','9,10', '10,6','10,10',
-        '11,0','11,1','11,7','11,13','11,14', '12,3','12,11', '13,3','13,11', '14,3','14,11',
-      ]);
-      const wrap = document.getElementById('daily-grid-preview');
-      for (let r = 0; r < 15; r++) {
-        for (let c = 0; c < 15; c++) {
-          const div = document.createElement('div');
-          div.className = 'card-grid-cell' + (blacks.has(r + ',' + c) ? ' black' : '');
-          wrap.appendChild(div);
-        }
-      }
-    })();
-  </script>
 
   <p class="editor-link">
     Want to create your own puzzle? <a href="editor.html">Open the editor →</a>
