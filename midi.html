@@ -807,8 +807,21 @@
           }
           const wordCells = getWordCells(direction, row, col, puzzle.solution);
           const idx = wordCells.findIndex(c => c.row === row && c.col === col);
-          if (idx !== -1 && idx < wordCells.length - 1) {
-            setSelectedCell(wordCells[idx + 1]);
+          let target = null;
+          if (idx !== -1) {
+            for (let i = idx + 1; i < wordCells.length; i++) {
+              const c = wordCells[i];
+              if (newGrid[c.row][c.col] === '') { target = c; break; }
+            }
+            if (!target) {
+              for (let i = 0; i < idx; i++) {
+                const c = wordCells[i];
+                if (newGrid[c.row][c.col] === '') { target = c; break; }
+              }
+            }
+          }
+          if (target) {
+            setSelectedCell(target);
           } else {
             const next = getNextWordTarget(direction, row, col, puzzle, newGrid);
             if (next) { setSelectedCell(next.cell); setDirection(next.direction); }
