@@ -167,6 +167,48 @@ const PUZZLES = [
       ],
     },
   },
+  {
+    solution: [
+      ['S','C','H','W','A'],
+      ['L',null,'O',null,'G'],
+      ['A','G','R','E','E'],
+      ['T',null,'S',null,'N'],
+      ['E','V','E','N','T'],
+    ],
+    clues: {
+      across: [
+        { number:1, row:0, col:0, len:5, clue:"The 'uh' vowel sound, in linguistics" },
+        { number:4, row:2, col:0, len:5, clue:'Concur' },
+        { number:5, row:4, col:0, len:5, clue:'Happening, or competition' },
+      ],
+      down: [
+        { number:1, row:0, col:0, len:5, clue:'Tabula ___, or a list of candidates' },
+        { number:2, row:0, col:2, len:5, clue:'Stallion, more generally' },
+        { number:3, row:0, col:4, len:5, clue:"007's title, or a literary representative" },
+      ],
+    },
+  },
+  {
+    solution: [
+      ['H','E','A','R','T'],
+      ['A',null,'L',null,'I'],
+      ['B','L','E','N','D'],
+      ['I',null,'R',null,'A'],
+      ['T','O','T','A','L'],
+    ],
+    clues: {
+      across: [
+        { number:1, row:0, col:0, len:5, clue:'♥, or center' },
+        { number:4, row:2, col:0, len:5, clue:'Smoothie verb' },
+        { number:5, row:4, col:0, len:5, clue:'Sum, or absolute' },
+      ],
+      down: [
+        { number:1, row:0, col:0, len:5, clue:"Routine action, or a nun's outfit" },
+        { number:2, row:0, col:2, len:5, clue:'On guard' },
+        { number:3, row:0, col:4, len:5, clue:"Like an ocean wave's pattern" },
+      ],
+    },
+  },
 ];
 
 const EPOCH = new Date('2026-05-01');
