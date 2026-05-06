@@ -219,6 +219,13 @@
       flex: 1; min-width: 0;
       font-style: italic; color: #1a1a1a;
     }
+    .active-clue-bar .acb-content {
+      display: flex; align-items: center; gap: 14px;
+      flex: 1; min-width: 0;
+      background: transparent; border: 0; padding: 0; margin: 0;
+      text-align: left; font: inherit; color: inherit;
+      cursor: pointer;
+    }
     .active-clue-bar .acb-nav {
       background: transparent; border: 1px solid #e3d9c2;
       padding: 4px 12px; font-size: 16px; line-height: 1;
@@ -251,6 +258,7 @@
     .kb-key:hover { background: #faf6ee; border-color: #1a1a1a; }
     .kb-key:active { background: #f3c969; border-color: #c08e1f; transform: translateY(1px); box-shadow: none; }
     .kb-wide { max-width: 84px; font-size: 16px; background: #f5f0e8; }
+    .kb-backspace { max-width: 56px; background: #f5f0e8; font-size: 16px; }
 
     /* CLUES */
     .clues-section { flex: 1; min-width: 0; }
@@ -598,29 +606,32 @@
       const handle = (k) => (e) => { e.preventDefault(); onKey(k); };
       return (
         <div className="mobile-keyboard">
-          {rows.map(row => (
+          {rows.map((row, i) => (
             <div className="kb-row" key={row}>
               {row.split('').map(k => (
                 <button key={k} className="kb-key" onPointerDown={handle(k)}>{k}</button>
               ))}
+              {i === rows.length - 1 && (
+                <button className="kb-key kb-backspace" onPointerDown={handle('Backspace')} aria-label="Backspace">⌫</button>
+              )}
             </div>
           ))}
-          <div className="kb-row">
-            <button className="kb-key kb-wide" onPointerDown={handle('Backspace')}>⌫</button>
-          </div>
         </div>
       );
     }
 
-    function ActiveClueBar({ activeClue, onPrev, onNext, extraClass }) {
+    function ActiveClueBar({ activeClue, onPrev, onNext, onToggle, extraClass }) {
       const cls = 'active-clue-bar' + (extraClass ? ' ' + extraClass : '') + (!activeClue ? ' empty' : '');
+      const otherDir = activeClue ? (activeClue.direction === 'across' ? 'down' : 'across') : '';
       return (
         <div className={cls} role="status" aria-live="polite">
           {activeClue ? (
             <>
               <button className="acb-nav" onClick={onPrev} aria-label="Previous clue">‹</button>
-              <span className="acb-tag">{activeClue.number} {activeClue.direction}</span>
-              <span className="acb-text">{activeClue.clue}</span>
+              <button type="button" className="acb-content" onClick={onToggle} aria-label={`Switch to ${otherDir} clue`}>
+                <span className="acb-tag">{activeClue.number} {activeClue.direction}</span>
+                <span className="acb-text">{activeClue.clue}</span>
+              </button>
               <button className="acb-nav" onClick={onNext} aria-label="Next clue">›</button>
             </>
           ) : (
@@ -884,6 +895,13 @@
         focusKbCapture();
       }
 
+      function toggleDirection() {
+        if (!selectedCell) return;
+        const toggled = direction === 'across' ? 'down' : 'across';
+        setDirection(getValidDirection(toggled, selectedCell.row, selectedCell.col, puzzle.solution));
+        focusKbCapture();
+      }
+
       function jumpToWord(dir, entry) {
         setDirection(dir);
         setSelectedCell({ row: entry.row, col: entry.col });
@@ -1002,6 +1020,7 @@
             activeClue={activeClue}
             onPrev={() => adjacentClue(-1)}
             onNext={() => adjacentClue(1)}
+            onToggle={toggleDirection}
             extraClass="inline-only"
           />
           <div className="puzzle-layout">
@@ -1042,6 +1061,7 @@
               activeClue={activeClue}
               onPrev={() => adjacentClue(-1)}
               onNext={() => adjacentClue(1)}
+              onToggle={toggleDirection}
             />
             <MobileKeyboard onKey={handleKey} />
           </div>
