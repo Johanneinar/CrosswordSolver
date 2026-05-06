@@ -1,6 +1,6 @@
-# CrosswordSolver
+# Croosly
 
-Two daily crossword puzzles styled like *The New Yorker* — a quick 5×5 Mini and a meatier 7×7 Midi. No app, no login — just open the link.
+Croosly — daily Mini and Midi crosswords inspired by *The New Yorker*. Free, no signup, no app.
 
 **Play:** https://johanneinar.github.io/CrosswordSolver/
 

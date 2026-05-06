@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CrosswordSolver</title>
+  <title>Croosly</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -912,7 +912,7 @@
       function handleShare() {
         const time = formatTime(timerSeconds);
         const date = formatDate(puzzle.dayIndex);
-        const text = `CrosswordSolver Mini\n${date}\nSolved in ${time} 🎉\n\nhttps://johanneinar.github.io/CrosswordSolver/mini.html`;
+        const text = `Croosly Mini\n${date}\nSolved in ${time} 🎉\n\nhttps://croosly.com/mini.html`;
         navigator.clipboard.writeText(text).then(() => {
           setShareConfirm('Copied to clipboard!');
           setTimeout(() => setShareConfirm(''), 3000);
