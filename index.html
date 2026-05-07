@@ -100,6 +100,27 @@
       font-style: italic;
       margin-bottom: 24px;
     }
+    .packs-heading-divided {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      font-family: 'Libre Baskerville', Georgia, serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: #888;
+      margin-bottom: 28px;
+    }
+    .packs-heading-divided::before,
+    .packs-heading-divided::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #ccc;
+      max-width: 90px;
+    }
     .pack-cards {
       display: flex;
       gap: 20px;
@@ -209,7 +230,7 @@
   <div class="header">
     <div class="eyebrow">The Croosly Crossword</div>
     <h1 class="title">Croosly</h1>
-    <p class="subtitle">Choose your puzzle</p>
+    <p class="subtitle">Three sizes. No app, no ads, no signup.</p>
   </div>
 
   <section class="packs-section" aria-labelledby="classic-heading">
@@ -261,8 +282,7 @@
   </section>
 
   <section class="packs-section" aria-labelledby="packs-heading">
-    <h2 class="packs-heading" id="packs-heading">Themed Packs</h2>
-    <p class="packs-sub">A small set of curated puzzles around a single topic.</p>
+    <h2 class="packs-heading-divided" id="packs-heading">Themed Packs</h2>
     <div class="pack-cards" id="pack-cards"></div>
   </section>
 
