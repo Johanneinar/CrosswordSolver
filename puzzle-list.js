@@ -19,7 +19,7 @@
   function sizeLabel(size) {
     if (size === 'mini') return 'Mini · 5×5';
     if (size === 'midi') return 'Midi · 7×7';
-    if (size === 'daily') return 'Daily · 15×15';
+    if (size === 'maxi') return 'Maxi · 15×15';
     return size || '';
   }
 

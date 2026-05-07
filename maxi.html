@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Croosly — Maxi Crossword</title>
+  <meta name="description" content="A 15×15 New York Times–style crossword. Around seventy clues, half an hour or so — Croosly's Maxi is the deepest of the three sizes.">
+  <link rel="canonical" href="https://croosly.com/maxi.html">
+  <meta name="theme-color" content="#1a1a1a">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Croosly">
+  <meta property="og:title" content="Croosly — Maxi Crossword">
+  <meta property="og:description" content="A 15×15 New York Times–style crossword. Around seventy clues, half an hour or so — Croosly's Maxi is the deepest of the three sizes.">
+  <meta property="og:url" content="https://croosly.com/maxi.html">
+  <meta property="og:image" content="https://croosly.com/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Croosly — Maxi Crossword">
+  <meta name="twitter:description" content="A 15×15 New York Times–style crossword. Around seventy clues, half an hour or so — Croosly's Maxi is the deepest of the three sizes.">
+  <meta name="twitter:image" content="https://croosly.com/og-image.png">
+
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="puzzles-maxi.js"></script>
+  <script src="puzzle-list.js"></script>
+  <script src="analytics.js"></script>
+  <script src="game.js"></script>
+</head>
+<body>
+  <div id="content"></div>
+
+  <footer class="site-footer">
+    <p>Made by Jóhann Ísaksson in Reykjavík</p>
+    <p><a href="about.html">About</a> · <a href="privacy.html">Privacy</a></p>
+    <p>© 2026 Croosly</p>
+  </footer>
+  <script>
+    (function () {
+      const content = document.getElementById('content');
+
+      function renderPlay(puzzleIndex) {
+        const safeIndex = Math.max(0, Math.min(PUZZLES.length - 1, puzzleIndex | 0));
+        document.title = 'Maxi #' + (safeIndex + 1) + ' — Croosly';
+
+        content.innerHTML = '';
+        const root = document.createElement('div');
+        root.id = 'root';
+        content.appendChild(root);
+
+        window.mountCrosswordGame({
+          rootId: 'root',
+          title: 'Maxi Crossword',
+          eyebrowText: '← Back to Maxi',
+          eyebrowHref: 'maxi.html',
+          statsKey: 'croosly-maxi-stats',
+          puzzles: PUZZLES,
+          shareLabel: 'Maxi',
+          shareUrl: 'https://croosly.com/maxi.html?p=' + safeIndex,
+          initialPuzzleIndex: safeIndex,
+          packId: 'maxi',
+          puzzleSize: 'maxi',
+        });
+      }
+
+      function renderList() {
+        window.renderPuzzleList({
+          container: content,
+          eyebrowText: '← All Puzzles',
+          eyebrowHref: 'index.html',
+          emoji: '📰',
+          title: 'Maxi',
+          description: 'The full New York Times-style 15 × 15. Around seventy clues, half an hour or so — deeper waters.',
+          accentColor: '#991b1b',
+          puzzles: PUZZLES,
+          statsKey: 'croosly-maxi-stats',
+          defaultSize: 'maxi',
+          metaItems: ['~70 clues per puzzle', '~25 min each'],
+          hrefForPuzzle: function (i) { return 'maxi.html?p=' + i; },
+        });
+      }
+
+      const params = new URLSearchParams(window.location.search);
+      const playParam = params.get('p');
+      if (playParam !== null) {
+        renderPlay(parseInt(playParam, 10));
+      } else {
+        renderList();
+      }
+    })();
+  </script>
+</body>
+</html>

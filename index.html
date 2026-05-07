@@ -141,12 +141,14 @@
     }
     .pack-card-grid.mini { grid-template-columns: repeat(5, 22px); }
     .pack-card-grid.midi { grid-template-columns: repeat(7, 16px); }
+    .pack-card-grid.maxi { grid-template-columns: repeat(15, 8px); }
     .pack-card-grid .card-grid-cell {
       background: #fefcf8;
       transition: background 0.15s;
     }
     .pack-card-grid.mini .card-grid-cell { width: 22px; height: 22px; }
     .pack-card-grid.midi .card-grid-cell { width: 16px; height: 16px; }
+    .pack-card-grid.maxi .card-grid-cell { width: 8px; height: 8px; }
     .pack-card-grid .card-grid-cell.black { background: #1a1a1a; }
     .pack-card:hover .pack-card-grid {
       background: #555;
@@ -246,6 +248,15 @@
           <span class="pack-card-progress" data-midi-progress>0 / 10 solved</span>
         </div>
       </a>
+      <a class="pack-card" href="maxi.html" style="--pack-color: #991b1b;">
+        <div class="pack-card-grid maxi" aria-hidden="true"></div>
+        <div class="pack-card-title">Maxi</div>
+        <div class="pack-card-desc">Full 15 × 15. Newspaper-style, around half an hour.</div>
+        <div class="pack-card-meta">
+          <span>2 puzzles</span>
+          <span class="pack-card-progress" data-maxi-progress>0 / 2 solved</span>
+        </div>
+      </a>
     </div>
   </section>
 
@@ -277,6 +288,7 @@
       [
         { selector: '[data-mini-progress]', statsKey: 'croosly-mini-stats', total: 10 },
         { selector: '[data-midi-progress]', statsKey: 'croosly-midi-stats', total: 10 },
+        { selector: '[data-maxi-progress]', statsKey: 'croosly-maxi-stats', total: 2 },
       ].forEach(function (c) {
         try {
           const stats = JSON.parse(localStorage.getItem(c.statsKey)) || {};
@@ -285,6 +297,27 @@
           if (el) el.textContent = solved + ' / ' + c.total + ' solved';
         } catch (e) { /* ignore */ }
       });
+
+      // Build the 15×15 maxi card preview (mini/midi grids are inline; maxi has 225 cells, JS-built).
+      const MAXI_BLACK = new Set([
+        '0,5','0,10','1,5','1,10','2,10','3,3','3,8',
+        '4,6','4,7','4,8','4,13','4,14',
+        '5,0','5,1','5,2','5,9',
+        '6,4','6,9','7,3','7,11','8,5','8,10',
+        '9,5','9,12','9,13','9,14',
+        '10,0','10,1','10,6','10,7','10,8',
+        '11,6','11,11','12,4','13,4','13,9','14,4','14,9',
+      ]);
+      const maxiGrid = document.querySelector('.pack-card-grid.maxi');
+      if (maxiGrid) {
+        for (let r = 0; r < 15; r++) {
+          for (let c = 0; c < 15; c++) {
+            const cell = document.createElement('div');
+            cell.className = 'card-grid-cell' + (MAXI_BLACK.has(r + ',' + c) ? ' black' : '');
+            maxiGrid.appendChild(cell);
+          }
+        }
+      }
 
       registry.forEach(function (pack) {
         let solvedCount = 0;
