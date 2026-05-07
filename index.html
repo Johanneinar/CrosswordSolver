@@ -146,6 +146,87 @@
     .editor-link a { color: #888; text-decoration: none; border-bottom: 1px solid #ccc; }
     .editor-link a:hover { color: #1a1a1a; border-bottom-color: #1a1a1a; }
 
+    /* THEMED PACKS */
+    .packs-section {
+      margin-top: 64px;
+      width: 100%;
+      max-width: 640px;
+    }
+    .packs-heading {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      text-align: center;
+      margin-bottom: 6px;
+    }
+    .packs-sub {
+      text-align: center;
+      font-size: 12px;
+      color: #888;
+      font-style: italic;
+      margin-bottom: 24px;
+    }
+    .pack-cards {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .pack-card {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      text-decoration: none;
+      color: #1a1a1a;
+      border: 2px solid #1a1a1a;
+      border-left: 6px solid var(--pack-color, #1a1a1a);
+      padding: 24px 24px;
+      flex: 1 1 240px;
+      max-width: 320px;
+      min-width: 220px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+    .pack-card:hover { background: #1a1a1a; color: #f5f0e8; }
+    .pack-card:hover .pack-card-meta { color: #bbb; }
+    .pack-card:hover .pack-card-progress { color: var(--pack-color, #d4a843); }
+    .pack-card-emoji {
+      font-size: 28px;
+      line-height: 1;
+    }
+    .pack-card-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      font-weight: 700;
+    }
+    .pack-card-desc {
+      font-size: 13px;
+      line-height: 1.5;
+      color: inherit;
+    }
+    .pack-card:not(:hover) .pack-card-desc { color: #555; }
+    .pack-card-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #888;
+      margin-top: 4px;
+    }
+    .pack-card-progress {
+      font-weight: 700;
+      color: #1a1a1a;
+    }
+    .packs-empty {
+      text-align: center;
+      font-size: 13px;
+      color: #888;
+      font-style: italic;
+    }
+
     .site-footer {
       margin-top: 64px;
       padding-top: 24px;
@@ -211,6 +292,12 @@
 
   </div>
 
+  <section class="packs-section" aria-labelledby="packs-heading">
+    <h2 class="packs-heading" id="packs-heading">Themed Packs</h2>
+    <p class="packs-sub">A small set of curated puzzles around a single topic.</p>
+    <div class="pack-cards" id="pack-cards"></div>
+  </section>
+
   <p class="editor-link">
     Want to create your own puzzle? <a href="editor.html">Open the editor →</a>
   </p>
@@ -221,5 +308,57 @@
     <p>© 2026 Croosly</p>
   </footer>
 
+  <script src="packs.js"></script>
+  <script>
+    (function () {
+      const container = document.getElementById('pack-cards');
+      const registry = window.PACK_REGISTRY || [];
+      if (!registry.length) {
+        container.innerHTML = '<p class="packs-empty">More packs coming soon.</p>';
+        return;
+      }
+      registry.forEach(function (pack) {
+        let solvedCount = 0;
+        try {
+          const stats = JSON.parse(localStorage.getItem('croosly-pack-' + pack.id + '-stats'));
+          if (stats && stats.solvedPuzzles) solvedCount = Object.keys(stats.solvedPuzzles).length;
+        } catch (e) { /* ignore */ }
+
+        const card = document.createElement('a');
+        card.className = 'pack-card';
+        card.href = 'pack.html?id=' + encodeURIComponent(pack.id);
+        card.style.setProperty('--pack-color', pack.color);
+
+        const emoji = document.createElement('div');
+        emoji.className = 'pack-card-emoji';
+        emoji.textContent = pack.emoji;
+        emoji.setAttribute('aria-hidden', 'true');
+        card.appendChild(emoji);
+
+        const title = document.createElement('div');
+        title.className = 'pack-card-title';
+        title.textContent = pack.title;
+        card.appendChild(title);
+
+        const desc = document.createElement('div');
+        desc.className = 'pack-card-desc';
+        desc.textContent = pack.description;
+        card.appendChild(desc);
+
+        const meta = document.createElement('div');
+        meta.className = 'pack-card-meta';
+        const sizeSpan = document.createElement('span');
+        sizeSpan.textContent = pack.puzzleCount + ' puzzles';
+        const progSpan = document.createElement('span');
+        progSpan.className = 'pack-card-progress';
+        progSpan.textContent = solvedCount + ' / ' + pack.puzzleCount + ' solved';
+        meta.appendChild(sizeSpan);
+        meta.appendChild(progSpan);
+        card.appendChild(meta);
+
+        container.appendChild(card);
+      });
+    })();
+  </script>
 </body>
 </html>
