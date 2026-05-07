@@ -32,4 +32,14 @@ window.PACK_REGISTRY = [
     file: 'packs/pop-2000s.js',
     global: 'PACK_POP_2000S',
   },
+  {
+    id: 'geography-travel',
+    title: 'Geography & Travel',
+    description: 'Capitals, landmarks, and faraway places.',
+    emoji: '🌍',
+    color: '#0d9488',
+    puzzleCount: 5,
+    file: 'packs/geography-travel.js',
+    global: 'PACK_GEOGRAPHY_TRAVEL',
+  },
 ];
