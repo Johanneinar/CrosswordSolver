@@ -70,73 +70,6 @@
       font-style: italic;
     }
 
-    .cards {
-      display: flex;
-      gap: 24px;
-      width: 100%;
-      max-width: 640px;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-
-    .card {
-      display: block;
-      text-decoration: none;
-      color: #1a1a1a;
-      border: 2px solid #1a1a1a;
-      padding: 32px 28px;
-      flex: 1;
-      min-width: 220px;
-      max-width: 280px;
-      transition: background 0.15s, color 0.15s;
-      cursor: pointer;
-    }
-    .card:hover { background: #1a1a1a; color: #f5f0e8; }
-    .card:hover .card-meta { color: #bbb; }
-    .card:hover .card-grid-cell { border-color: #555; background: #333; }
-    .card:hover .card-grid-cell.black { background: #f5f0e8; }
-
-    .card-size {
-      font-family: 'Playfair Display', serif;
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      margin-bottom: 6px;
-    }
-    .card-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 30px;
-      font-weight: 700;
-      margin-bottom: 16px;
-    }
-
-    .card-grid {
-      display: grid;
-      gap: 2px;
-      margin-bottom: 20px;
-    }
-    .card-grid.mini { grid-template-columns: repeat(5, 16px); }
-    .card-grid.midi { grid-template-columns: repeat(7, 12px); }
-    .card-grid.daily { grid-template-columns: repeat(15, 6px); gap: 1px; }
-
-    .card-grid-cell {
-      border: 1.5px solid #1a1a1a;
-      background: #fff;
-      transition: background 0.15s, border-color 0.15s;
-    }
-    .card-grid.mini .card-grid-cell { width: 16px; height: 16px; }
-    .card-grid.midi .card-grid-cell { width: 12px; height: 12px; }
-    .card-grid.daily .card-grid-cell { width: 6px; height: 6px; border-width: 0.5px; }
-    .card-grid-cell.black { background: #1a1a1a; border-color: #1a1a1a; }
-
-    .card-meta {
-      font-size: 12px;
-      color: #666;
-      line-height: 1.7;
-      transition: color 0.15s;
-    }
-
     .editor-link {
       margin-top: 48px;
       font-size: 12px;
@@ -146,12 +79,12 @@
     .editor-link a { color: #888; text-decoration: none; border-bottom: 1px solid #ccc; }
     .editor-link a:hover { color: #1a1a1a; border-bottom-color: #1a1a1a; }
 
-    /* THEMED PACKS */
+    /* PACK SECTIONS */
     .packs-section {
-      margin-top: 64px;
       width: 100%;
       max-width: 640px;
     }
+    .packs-section + .packs-section { margin-top: 56px; }
     .packs-heading {
       font-family: 'Playfair Display', Georgia, serif;
       font-size: 22px;
@@ -195,6 +128,32 @@
       font-size: 28px;
       line-height: 1;
     }
+    /* Classic Mini/Midi: framed crossword as the hero — gap shows through as grid lines */
+    .pack-card-grid {
+      display: grid;
+      gap: 1.5px;
+      align-self: center;
+      padding: 5px;
+      background: #1a1a1a;
+      box-shadow: 0 2px 0 0 var(--pack-color, #1a1a1a);
+      transition: background 0.15s, box-shadow 0.15s;
+      margin: 6px 0 4px;
+    }
+    .pack-card-grid.mini { grid-template-columns: repeat(5, 22px); }
+    .pack-card-grid.midi { grid-template-columns: repeat(7, 16px); }
+    .pack-card-grid .card-grid-cell {
+      background: #fefcf8;
+      transition: background 0.15s;
+    }
+    .pack-card-grid.mini .card-grid-cell { width: 22px; height: 22px; }
+    .pack-card-grid.midi .card-grid-cell { width: 16px; height: 16px; }
+    .pack-card-grid .card-grid-cell.black { background: #1a1a1a; }
+    .pack-card:hover .pack-card-grid {
+      background: #555;
+      box-shadow: 0 2px 0 0 var(--pack-color, #f5f0e8);
+    }
+    .pack-card:hover .card-grid-cell { background: #333; }
+    .pack-card:hover .card-grid-cell.black { background: #f5f0e8; }
     .pack-card-title {
       font-family: 'Playfair Display', serif;
       font-size: 22px;
@@ -251,46 +210,44 @@
     <p class="subtitle">Choose your puzzle</p>
   </div>
 
-  <div class="cards">
-
-    <a class="card" href="mini.html">
-      <div class="card-size">Mini · 5×5</div>
-      <div class="card-title">Mini</div>
-      <!-- Mini grid preview: black cells at (1,1),(1,3),(3,1),(3,3) -->
-      <div class="card-grid mini">
-        <div class="card-grid-cell"></div><div class="card-grid-cell"></div><div class="card-grid-cell"></div><div class="card-grid-cell"></div><div class="card-grid-cell"></div>
-        <div class="card-grid-cell"></div><div class="card-grid-cell black"></div><div class="card-grid-cell"></div><div class="card-grid-cell black"></div><div class="card-grid-cell"></div>
-        <div class="card-grid-cell"></div><div class="card-grid-cell"></div><div class="card-grid-cell"></div><div class="card-grid-cell"></div><div class="card-grid-cell"></div>
-        <div class="card-grid-cell"></div><div class="card-grid-cell black"></div><div class="card-grid-cell"></div><div class="card-grid-cell black"></div><div class="card-grid-cell"></div>
-        <div class="card-grid-cell"></div><div class="card-grid-cell"></div><div class="card-grid-cell"></div><div class="card-grid-cell"></div><div class="card-grid-cell"></div>
-      </div>
-      <div class="card-meta">
-        6 clues · ~2 min<br>
-        10 puzzles, pick your pace
-      </div>
-    </a>
-
-    <a class="card" href="midi.html">
-      <div class="card-size">Midi · 7×7</div>
-      <div class="card-title">Midi</div>
-      <!-- preview -->
-      <!-- Midi grid preview: black cells at all odd×odd positions -->
-      <div class="card-grid midi">
-        <div class="card-grid-cell"></div><div class="card-grid-cell"></div><div class="card-grid-cell"></div><div class="card-grid-cell"></div><div class="card-grid-cell"></div><div class="card-grid-cell"></div><div class="card-grid-cell"></div>
-        <div class="card-grid-cell"></div><div class="card-grid-cell black"></div><div class="card-grid-cell"></div><div class="card-grid-cell black"></div><div class="card-grid-cell"></div><div class="card-grid-cell black"></div><div class="card-grid-cell"></div>
-        <div class="card-grid-cell"></div><div class="card-grid-cell"></div><div class="card-grid-cell"></div><div class="card-grid-cell"></div><div class="card-grid-cell"></div><div class="card-grid-cell"></div><div class="card-grid-cell"></div>
-        <div class="card-grid-cell"></div><div class="card-grid-cell black"></div><div class="card-grid-cell"></div><div class="card-grid-cell black"></div><div class="card-grid-cell"></div><div class="card-grid-cell black"></div><div class="card-grid-cell"></div>
-        <div class="card-grid-cell"></div><div class="card-grid-cell"></div><div class="card-grid-cell"></div><div class="card-grid-cell"></div><div class="card-grid-cell"></div><div class="card-grid-cell"></div><div class="card-grid-cell"></div>
-        <div class="card-grid-cell"></div><div class="card-grid-cell black"></div><div class="card-grid-cell"></div><div class="card-grid-cell black"></div><div class="card-grid-cell"></div><div class="card-grid-cell black"></div><div class="card-grid-cell"></div>
-        <div class="card-grid-cell"></div><div class="card-grid-cell"></div><div class="card-grid-cell"></div><div class="card-grid-cell"></div><div class="card-grid-cell"></div><div class="card-grid-cell"></div><div class="card-grid-cell"></div>
-      </div>
-      <div class="card-meta">
-        8 clues · ~8 min<br>
-        10 puzzles, pick your pace
-      </div>
-    </a>
-
-  </div>
+  <section class="packs-section" aria-labelledby="classic-heading">
+    <h2 class="packs-heading" id="classic-heading">Classic</h2>
+    <p class="packs-sub">Numbered minis and midis. Pick any to play.</p>
+    <div class="pack-cards">
+      <a class="pack-card" href="mini.html" style="--pack-color: #2563eb;">
+        <div class="pack-card-grid mini" aria-hidden="true">
+          <div class="card-grid-cell"></div><div class="card-grid-cell"></div><div class="card-grid-cell"></div><div class="card-grid-cell"></div><div class="card-grid-cell"></div>
+          <div class="card-grid-cell"></div><div class="card-grid-cell black"></div><div class="card-grid-cell"></div><div class="card-grid-cell black"></div><div class="card-grid-cell"></div>
+          <div class="card-grid-cell"></div><div class="card-grid-cell"></div><div class="card-grid-cell"></div><div class="card-grid-cell"></div><div class="card-grid-cell"></div>
+          <div class="card-grid-cell"></div><div class="card-grid-cell black"></div><div class="card-grid-cell"></div><div class="card-grid-cell black"></div><div class="card-grid-cell"></div>
+          <div class="card-grid-cell"></div><div class="card-grid-cell"></div><div class="card-grid-cell"></div><div class="card-grid-cell"></div><div class="card-grid-cell"></div>
+        </div>
+        <div class="pack-card-title">Mini</div>
+        <div class="pack-card-desc">Quick five-by-five. Solvable over coffee.</div>
+        <div class="pack-card-meta">
+          <span>10 puzzles</span>
+          <span class="pack-card-progress" data-mini-progress>0 / 10 solved</span>
+        </div>
+      </a>
+      <a class="pack-card" href="midi.html" style="--pack-color: #b45309;">
+        <div class="pack-card-grid midi" aria-hidden="true">
+          <div class="card-grid-cell"></div><div class="card-grid-cell"></div><div class="card-grid-cell"></div><div class="card-grid-cell"></div><div class="card-grid-cell"></div><div class="card-grid-cell"></div><div class="card-grid-cell"></div>
+          <div class="card-grid-cell"></div><div class="card-grid-cell black"></div><div class="card-grid-cell"></div><div class="card-grid-cell black"></div><div class="card-grid-cell"></div><div class="card-grid-cell black"></div><div class="card-grid-cell"></div>
+          <div class="card-grid-cell"></div><div class="card-grid-cell"></div><div class="card-grid-cell"></div><div class="card-grid-cell"></div><div class="card-grid-cell"></div><div class="card-grid-cell"></div><div class="card-grid-cell"></div>
+          <div class="card-grid-cell"></div><div class="card-grid-cell black"></div><div class="card-grid-cell"></div><div class="card-grid-cell black"></div><div class="card-grid-cell"></div><div class="card-grid-cell black"></div><div class="card-grid-cell"></div>
+          <div class="card-grid-cell"></div><div class="card-grid-cell"></div><div class="card-grid-cell"></div><div class="card-grid-cell"></div><div class="card-grid-cell"></div><div class="card-grid-cell"></div><div class="card-grid-cell"></div>
+          <div class="card-grid-cell"></div><div class="card-grid-cell black"></div><div class="card-grid-cell"></div><div class="card-grid-cell black"></div><div class="card-grid-cell"></div><div class="card-grid-cell black"></div><div class="card-grid-cell"></div>
+          <div class="card-grid-cell"></div><div class="card-grid-cell"></div><div class="card-grid-cell"></div><div class="card-grid-cell"></div><div class="card-grid-cell"></div><div class="card-grid-cell"></div><div class="card-grid-cell"></div>
+        </div>
+        <div class="pack-card-title">Midi</div>
+        <div class="pack-card-desc">Seven-by-seven. A bit longer, a bit deeper.</div>
+        <div class="pack-card-meta">
+          <span>10 puzzles</span>
+          <span class="pack-card-progress" data-midi-progress>0 / 10 solved</span>
+        </div>
+      </a>
+    </div>
+  </section>
 
   <section class="packs-section" aria-labelledby="packs-heading">
     <h2 class="packs-heading" id="packs-heading">Themed Packs</h2>
@@ -317,6 +274,18 @@
         container.innerHTML = '<p class="packs-empty">More packs coming soon.</p>';
         return;
       }
+      [
+        { selector: '[data-mini-progress]', statsKey: 'croosly-mini-stats', total: 10 },
+        { selector: '[data-midi-progress]', statsKey: 'croosly-midi-stats', total: 10 },
+      ].forEach(function (c) {
+        try {
+          const stats = JSON.parse(localStorage.getItem(c.statsKey)) || {};
+          const solved = stats.solvedPuzzles ? Object.keys(stats.solvedPuzzles).length : 0;
+          const el = document.querySelector(c.selector);
+          if (el) el.textContent = solved + ' / ' + c.total + ' solved';
+        } catch (e) { /* ignore */ }
+      });
+
       registry.forEach(function (pack) {
         let solvedCount = 0;
         try {

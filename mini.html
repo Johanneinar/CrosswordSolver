@@ -32,11 +32,12 @@
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="puzzles-mini.js"></script>
+  <script src="puzzle-list.js"></script>
   <script src="analytics.js"></script>
   <script src="game.js"></script>
 </head>
 <body>
-  <div id="root"></div>
+  <div id="content"></div>
 
   <footer class="site-footer">
     <p>Made by Jóhann Ísaksson in Reykjavík</p>
@@ -44,18 +45,59 @@
     <p>© 2026 Croosly</p>
   </footer>
   <script>
-    mountCrosswordGame({
-      rootId: 'root',
-      title: 'Mini Crossword',
-      eyebrowText: '← All Puzzles',
-      eyebrowHref: 'index.html',
-      statsKey: 'croosly-mini-stats',
-      puzzles: PUZZLES,
-      cellSize: 58,
-      shareLabel: 'Mini',
-      shareUrl: 'https://croosly.com/mini.html',
-      puzzleSize: 'mini',
-    });
+    (function () {
+      const content = document.getElementById('content');
+
+      function renderPlay(puzzleIndex) {
+        const safeIndex = Math.max(0, Math.min(PUZZLES.length - 1, puzzleIndex | 0));
+        document.title = 'Mini #' + (safeIndex + 1) + ' — Croosly';
+
+        content.innerHTML = '';
+        const root = document.createElement('div');
+        root.id = 'root';
+        content.appendChild(root);
+
+        window.mountCrosswordGame({
+          rootId: 'root',
+          title: 'Mini Crossword',
+          eyebrowText: '← Back to Mini',
+          eyebrowHref: 'mini.html',
+          statsKey: 'croosly-mini-stats',
+          puzzles: PUZZLES,
+          cellSize: 58,
+          shareLabel: 'Mini',
+          shareUrl: 'https://croosly.com/mini.html?p=' + safeIndex,
+          initialPuzzleIndex: safeIndex,
+          packId: 'mini',
+          puzzleSize: 'mini',
+        });
+      }
+
+      function renderList() {
+        window.renderPuzzleList({
+          container: content,
+          eyebrowText: '← All Puzzles',
+          eyebrowHref: 'index.html',
+          emoji: '☕',
+          title: 'Mini',
+          description: 'Quick five-by-five. Six clues, about two minutes — solvable over coffee.',
+          accentColor: '#2563eb',
+          puzzles: PUZZLES,
+          statsKey: 'croosly-mini-stats',
+          defaultSize: 'mini',
+          metaItems: ['6 clues per puzzle', '~2 min each'],
+          hrefForPuzzle: function (i) { return 'mini.html?p=' + i; },
+        });
+      }
+
+      const params = new URLSearchParams(window.location.search);
+      const playParam = params.get('p');
+      if (playParam !== null) {
+        renderPlay(parseInt(playParam, 10));
+      } else {
+        renderList();
+      }
+    })();
   </script>
 </body>
 </html>

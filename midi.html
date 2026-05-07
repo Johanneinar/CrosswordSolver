@@ -32,11 +32,12 @@
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="puzzles-midi.js"></script>
+  <script src="puzzle-list.js"></script>
   <script src="analytics.js"></script>
   <script src="game.js"></script>
 </head>
 <body>
-  <div id="root"></div>
+  <div id="content"></div>
 
   <footer class="site-footer">
     <p>Made by Jóhann Ísaksson in Reykjavík</p>
@@ -44,18 +45,59 @@
     <p>© 2026 Croosly</p>
   </footer>
   <script>
-    mountCrosswordGame({
-      rootId: 'root',
-      title: 'Midi Crossword',
-      eyebrowText: '← All Puzzles',
-      eyebrowHref: 'index.html',
-      statsKey: 'croosly-midi-stats',
-      puzzles: PUZZLES,
-      cellSize: 46,
-      shareLabel: 'Midi',
-      shareUrl: 'https://croosly.com/midi.html',
-      puzzleSize: 'midi',
-    });
+    (function () {
+      const content = document.getElementById('content');
+
+      function renderPlay(puzzleIndex) {
+        const safeIndex = Math.max(0, Math.min(PUZZLES.length - 1, puzzleIndex | 0));
+        document.title = 'Midi #' + (safeIndex + 1) + ' — Croosly';
+
+        content.innerHTML = '';
+        const root = document.createElement('div');
+        root.id = 'root';
+        content.appendChild(root);
+
+        window.mountCrosswordGame({
+          rootId: 'root',
+          title: 'Midi Crossword',
+          eyebrowText: '← Back to Midi',
+          eyebrowHref: 'midi.html',
+          statsKey: 'croosly-midi-stats',
+          puzzles: PUZZLES,
+          cellSize: 46,
+          shareLabel: 'Midi',
+          shareUrl: 'https://croosly.com/midi.html?p=' + safeIndex,
+          initialPuzzleIndex: safeIndex,
+          packId: 'midi',
+          puzzleSize: 'midi',
+        });
+      }
+
+      function renderList() {
+        window.renderPuzzleList({
+          container: content,
+          eyebrowText: '← All Puzzles',
+          eyebrowHref: 'index.html',
+          emoji: '📖',
+          title: 'Midi',
+          description: 'A meatier seven-by-seven. Eight clues, about eight minutes — a little deeper.',
+          accentColor: '#b45309',
+          puzzles: PUZZLES,
+          statsKey: 'croosly-midi-stats',
+          defaultSize: 'midi',
+          metaItems: ['8 clues per puzzle', '~8 min each'],
+          hrefForPuzzle: function (i) { return 'midi.html?p=' + i; },
+        });
+      }
+
+      const params = new URLSearchParams(window.location.search);
+      const playParam = params.get('p');
+      if (playParam !== null) {
+        renderPlay(parseInt(playParam, 10));
+      } else {
+        renderList();
+      }
+    })();
   </script>
 </body>
 </html>

@@ -29,146 +29,11 @@
 
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
-  <style>
-    /* Pack list view — uses the shared serif aesthetic but its own layout */
-    .pack-shell {
-      width: 100%;
-      max-width: 640px;
-    }
-    .pack-header {
-      text-align: center;
-      margin-bottom: 32px;
-      padding-bottom: 20px;
-      border-bottom: 2px solid var(--pack-accent, #1a1a1a);
-    }
-    .pack-eyebrow {
-      font-size: 11px;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: #666;
-      margin-bottom: 10px;
-    }
-    .pack-eyebrow a {
-      color: #666;
-      text-decoration: none;
-    }
-    .pack-eyebrow a:hover { color: #1a1a1a; }
-    .pack-emoji {
-      font-size: 42px;
-      line-height: 1;
-      margin-bottom: 12px;
-    }
-    .pack-title {
-      font-family: 'Playfair Display', Georgia, serif;
-      font-size: 38px;
-      font-weight: 700;
-      letter-spacing: -0.5px;
-      margin-bottom: 10px;
-    }
-    .pack-desc {
-      font-size: 14px;
-      color: #555;
-      font-style: italic;
-      line-height: 1.5;
-    }
-    .pack-progress {
-      font-size: 11px;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: #888;
-      margin-top: 14px;
-    }
-
-    .puzzle-list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .puzzle-row {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      padding: 16px 20px;
-      border: 1.5px solid #1a1a1a;
-      background: #fff;
-      text-decoration: none;
-      color: #1a1a1a;
-      cursor: pointer;
-      transition: background 0.12s, color 0.12s;
-    }
-    .puzzle-row:hover {
-      background: #1a1a1a;
-      color: #f5f0e8;
-    }
-    .puzzle-row:hover .puzzle-row-meta { color: #bbb; }
-    .puzzle-row-num {
-      font-family: 'Playfair Display', serif;
-      font-size: 22px;
-      font-weight: 700;
-      flex-shrink: 0;
-      min-width: 28px;
-      text-align: center;
-    }
-    .puzzle-row-body {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-    .puzzle-row-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 14px;
-      font-weight: 700;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-    }
-    .puzzle-row-meta {
-      font-size: 12px;
-      color: #666;
-      font-style: italic;
-    }
-    .puzzle-row-status {
-      font-size: 18px;
-      flex-shrink: 0;
-      color: #2e7d32;
-    }
-    .puzzle-row-status.unsolved { color: transparent; }
-
-    .pack-error {
-      width: 100%;
-      max-width: 480px;
-      text-align: center;
-      margin-top: 64px;
-    }
-    .pack-error h1 {
-      font-family: 'Playfair Display', serif;
-      font-size: 28px;
-      margin-bottom: 12px;
-    }
-    .pack-error p {
-      font-size: 14px;
-      color: #666;
-      font-style: italic;
-      margin-bottom: 24px;
-      line-height: 1.5;
-    }
-    .pack-error a {
-      font-family: 'Libre Baskerville', serif;
-      font-size: 12px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: #1a1a1a;
-      border: 1.5px solid #1a1a1a;
-      padding: 8px 20px;
-      text-decoration: none;
-      display: inline-block;
-    }
-    .pack-error a:hover { background: #1a1a1a; color: #f5f0e8; }
-  </style>
 
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="packs.js"></script>
+  <script src="puzzle-list.js"></script>
   <script src="analytics.js"></script>
   <script src="game.js"></script>
 </head>
@@ -206,115 +71,27 @@
         });
       }
 
-      function loadStats(statsKey) {
-        try {
-          return JSON.parse(localStorage.getItem(statsKey)) ||
-            { solvedPuzzles: {}, bestTime: null };
-        } catch (e) {
-          return { solvedPuzzles: {}, bestTime: null };
-        }
-      }
-
-      function formatTime(seconds) {
-        const m = Math.floor(seconds / 60);
-        const s = seconds % 60;
-        return m + ':' + (s < 10 ? '0' : '') + s;
-      }
-
-      function sizeLabel(size) {
-        if (size === 'mini') return 'Mini · 5×5';
-        if (size === 'midi') return 'Midi · 7×7';
-        if (size === 'daily') return 'Daily · 15×15';
-        return size;
-      }
-
       function renderList(pack, statsKey) {
         document.title = pack.title + ' — Croosly';
         const meta = document.querySelector('meta[name="description"]');
         if (meta) meta.setAttribute('content', pack.description);
 
-        const stats = loadStats(statsKey);
-        const solved = stats.solvedPuzzles || {};
-        const solvedCount = Object.keys(solved).length;
-
-        content.innerHTML = '';
-        document.body.style.setProperty('--pack-accent', pack.color);
-
-        const main = document.createElement('main');
-        main.className = 'pack-shell';
-
-        const header = document.createElement('header');
-        header.className = 'pack-header';
-
-        const eyebrow = document.createElement('div');
-        eyebrow.className = 'pack-eyebrow';
-        const a = document.createElement('a');
-        a.href = 'index.html';
-        a.textContent = '← All Puzzles';
-        eyebrow.appendChild(a);
-        header.appendChild(eyebrow);
-
-        const emoji = document.createElement('div');
-        emoji.className = 'pack-emoji';
-        emoji.textContent = pack.emoji;
-        emoji.setAttribute('aria-hidden', 'true');
-        header.appendChild(emoji);
-
-        const title = document.createElement('h1');
-        title.className = 'pack-title';
-        title.textContent = pack.title;
-        header.appendChild(title);
-
-        const desc = document.createElement('p');
-        desc.className = 'pack-desc';
-        desc.textContent = pack.description;
-        header.appendChild(desc);
-
-        const progress = document.createElement('div');
-        progress.className = 'pack-progress';
-        progress.textContent = solvedCount + ' / ' + pack.puzzles.length + ' solved';
-        header.appendChild(progress);
-
-        main.appendChild(header);
-
-        const list = document.createElement('div');
-        list.className = 'puzzle-list';
-        pack.puzzles.forEach(function (puzzle, i) {
-          const link = document.createElement('a');
-          const params = new URLSearchParams(window.location.search);
-          params.set('p', String(i));
-          link.href = 'pack.html?' + params.toString();
-          link.className = 'puzzle-row';
-
-          const num = document.createElement('div');
-          num.className = 'puzzle-row-num';
-          num.textContent = String(i + 1);
-          link.appendChild(num);
-
-          const body = document.createElement('div');
-          body.className = 'puzzle-row-body';
-          const t = document.createElement('div');
-          t.className = 'puzzle-row-title';
-          t.textContent = 'Puzzle ' + (i + 1);
-          body.appendChild(t);
-          const m = document.createElement('div');
-          m.className = 'puzzle-row-meta';
-          const time = solved[i];
-          m.textContent = sizeLabel(puzzle.size) +
-            (time !== undefined ? ' · solved in ' + formatTime(time) : '');
-          body.appendChild(m);
-          link.appendChild(body);
-
-          const status = document.createElement('div');
-          status.className = 'puzzle-row-status' + (time !== undefined ? '' : ' unsolved');
-          status.textContent = '✓';
-          status.setAttribute('aria-label', time !== undefined ? 'Solved' : 'Not yet solved');
-          link.appendChild(status);
-
-          list.appendChild(link);
+        window.renderPuzzleList({
+          container: content,
+          eyebrowText: '← All Puzzles',
+          eyebrowHref: 'index.html',
+          emoji: pack.emoji,
+          title: pack.title,
+          description: pack.description,
+          accentColor: pack.color,
+          puzzles: pack.puzzles,
+          statsKey: statsKey,
+          hrefForPuzzle: function (i) {
+            const qp = new URLSearchParams(window.location.search);
+            qp.set('p', String(i));
+            return 'pack.html?' + qp.toString();
+          },
         });
-        main.appendChild(list);
-        content.appendChild(main);
       }
 
       function renderPlay(pack, statsKey, puzzleIndex) {
