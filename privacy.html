@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Croosly — Privacy</title>
-  <meta name="description" content="Croosly stores nothing on its servers. Your stats live in your browser's localStorage. No analytics, no tracking, no ads — just two crosswords a day.">
+  <meta name="description" content="Croosly is private by default. Your stats live in your browser. The only thing we collect is anonymous solve times — no name, no email, no personal data.">
   <link rel="canonical" href="https://croosly.com/privacy.html">
   <meta name="theme-color" content="#1a1a1a">
 
@@ -16,7 +16,7 @@
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Croosly">
   <meta property="og:title" content="Croosly — Privacy">
-  <meta property="og:description" content="Croosly stores nothing on its servers. Your stats live in your browser's localStorage. No analytics, no tracking, no ads — just two crosswords a day.">
+  <meta property="og:description" content="Croosly is private by default. Your stats live in your browser. The only thing we collect is anonymous solve times — no name, no email, no personal data.">
   <meta property="og:url" content="https://croosly.com/privacy.html">
   <meta property="og:image" content="https://croosly.com/og-image.png">
   <meta property="og:image:width" content="1200">
@@ -24,7 +24,7 @@
 
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Croosly — Privacy">
-  <meta name="twitter:description" content="Croosly stores nothing on its servers. Your stats live in your browser's localStorage. No analytics, no tracking, no ads — just two crosswords a day.">
+  <meta name="twitter:description" content="Croosly is private by default. Your stats live in your browser. The only thing we collect is anonymous solve times — no name, no email, no personal data.">
   <meta name="twitter:image" content="https://croosly.com/og-image.png">
 
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -111,15 +111,18 @@
 
     <p>Croosly is built to be private by default.</p>
 
-    <p><strong>Your stats stay in your browser.</strong> Solve times, streaks, and which puzzles you've completed are stored in your browser's <code>localStorage</code>. They don't sync between devices, and they're gone if you clear your browsing data. Croosly never sees them.</p>
+    <p><strong>Your stats stay in your browser.</strong> The solve times, streaks, and completed-puzzle lists shown in the app are stored in your browser's <code>localStorage</code>. They don't sync between devices, and they're gone if you clear your browsing data.</p>
 
-    <p><strong>No tracking.</strong> No analytics, no cookies, no ads, no fingerprinting. The site doesn't know who you are.</p>
+    <p><strong>Anonymous solve events.</strong> When you finish a puzzle, Croosly sends one small record to its database: the puzzle's size and number, your solve time, and a random ID generated in your browser the first time you play (stored in <code>localStorage</code> as <code>croosly-device-id</code>). That's it — no name, no email, no IP address kept, no fingerprinting. Clearing your browser data resets the random ID. We use this only to understand which puzzles people play and how hard they feel.</p>
 
-    <p><strong>Third-party services.</strong> Croosly loads two things from CDNs:</p>
+    <p><strong>No cookies, no ads.</strong> Croosly doesn't set cookies, doesn't run ads, and doesn't share data with third parties.</p>
+
+    <p><strong>Third-party services.</strong> Croosly loads a few things from external services:</p>
 
     <ul>
       <li><strong>Google Fonts</strong> — Playfair Display and Libre Baskerville.</li>
-      <li><strong>unpkg.com</strong> — React 18 and Babel Standalone.</li>
+      <li><strong>unpkg.com</strong> — React 18.</li>
+      <li><strong>Supabase</strong> — receives the anonymous solve events described above.</li>
     </ul>
 
     <p>That's it.</p>

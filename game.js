@@ -387,6 +387,8 @@
       shareLabel,
       shareUrl,
       initialPuzzleIndex,
+      packId,
+      puzzleSize,
     } = config;
 
     const [puzzleIndex, setPuzzleIndex] = useState(() =>
@@ -477,6 +479,14 @@
           setConfetti(true);
           setTimeout(() => setConfetti(false), 3000);
           recordSolve(statsKey, puzzle.puzzleIndex, timerSeconds);
+          if (window.croosly && window.croosly.logSolve) {
+            window.croosly.logSolve({
+              packId: packId || null,
+              puzzleSize: puzzleSize || puzzle.size || null,
+              puzzleIndex: puzzle.puzzleIndex,
+              timeSeconds: timerSeconds,
+            });
+          }
         }
         const wordCells = getWordCells(direction, row, col, puzzle.solution);
         const idx = wordCells.findIndex(c => c.row === row && c.col === col);
@@ -650,6 +660,14 @@
         setConfetti(true);
         setTimeout(() => setConfetti(false), 3000);
         recordSolve(statsKey, puzzle.puzzleIndex, timerSeconds);
+        if (window.croosly && window.croosly.logSolve) {
+          window.croosly.logSolve({
+            packId: packId || null,
+            puzzleSize: puzzleSize || puzzle.size || null,
+            puzzleIndex: puzzle.puzzleIndex,
+            timeSeconds: timerSeconds,
+          });
+        }
       }
     }
 
