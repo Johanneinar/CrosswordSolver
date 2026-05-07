@@ -1,6 +1,6 @@
 # Croosly
 
-Croosly — Mini and Midi crosswords inspired by *The New York Times*. Free, no signup, no app.
+Croosly — Mini, Midi, and Maxi crosswords inspired by *The New York Times*. Free, no signup, no app.
 
 **Play:** https://croosly.com/
 
@@ -10,16 +10,15 @@ Croosly — Mini and Midi crosswords inspired by *The New York Times*. Free, no 
 
 - **Mini · 5×5** — 6 clues, ~2 min. Quick warm-up.
 - **Midi · 7×7** — 8 clues, ~8 min. Bigger challenge with longer words.
-- **Daily · 15×15** — ~60-78 clues, ~25 min. Full NYT-style daily. (Seeded with 2 algorithmically-generated puzzles; expand by importing `.puz` files.)
+- **Maxi · 15×15** — ~60-78 clues, ~25 min. Full NYT-style 15×15. (Seeded with 2 algorithmically-generated puzzles; expand by importing `.puz` files.)
 
-The home page lets you pick which to play. Each size has its own numbered set of puzzles and tracks which you've solved plus your best time. Daily-size puzzles can be added by importing `.puz` files via the editor.
+The home page lets you pick which to play. Each size has its own numbered set of puzzles and tracks which you've solved plus your best time. Maxi-size puzzles can be added by importing `.puz` files via the editor.
 
 ---
 
 ## Features
 
-- **Numbered puzzle set** — 10 hand-picked puzzles each in Mini and Midi; pick any with the chip picker or the ‹ › arrows
-- **Auto-resume** — opens to your first unsolved puzzle on each visit
+- **Numbered puzzle set** — 10 hand-picked puzzles each in Mini and Midi (2 in Maxi); pick from the list view or the ‹ › arrows
 - **Already solved** — if you've solved a puzzle, your time is shown when you return to it
 - **Auto-advance** — cursor jumps to the next unsolved word, skipping cells already filled in
 - **Check All / Check Word** — mark correct cells green and wrong cells red, for the full puzzle or just the active word
@@ -74,7 +73,7 @@ Mini puzzles live in [`puzzles-mini.js`](puzzles-mini.js); Midi puzzles in [`puz
 
 https://croosly.com/editor.html
 
-- Pick **Mini (5×5)**, **Midi (7×7)**, or **Daily (15×15)** at the top
+- Pick **Mini (5×5)**, **Midi (7×7)**, or **Maxi (15×15)** at the top
 - Right-click cells to toggle them black
 - Type letters to fill in answers
 - Enter clues in the panel on the right
@@ -82,13 +81,13 @@ https://croosly.com/editor.html
 
 ### Importing `.puz` Files
 
-The editor has an **Import .puz** button that parses standard `.puz` crossword files (the format used by Across Lite and most crossword software). Useful for adding 15×15 Daily puzzles from public-domain sources.
+The editor has an **Import .puz** button that parses standard `.puz` crossword files (the format used by Across Lite and most crossword software). Useful for adding 15×15 Maxi puzzles from public-domain sources.
 
 1. Click **Import .puz** in the editor toolbar
 2. Select a `.puz` file
 3. The grid, letters, and clues are loaded automatically
 4. Click **Copy to Clipboard** to get the JSON
-5. Paste into `puzzles-daily.js` (or `puzzles-mini.js` / `puzzles-midi.js` depending on size)
+5. Paste into `puzzles-maxi.js` (or `puzzles-mini.js` / `puzzles-midi.js` depending on size)
 
 Public-domain `.puz` sources include:
 - `crosswordnexus.com/puzzles` (some constructor archives are CC-licensed)
@@ -100,14 +99,15 @@ Public-domain `.puz` sources include:
 ## File Structure
 
 ```
-index.html       # Selection screen — pick Mini, Midi, or Daily
-mini.html        # 5×5 game
-midi.html        # 7×7 game
-daily.html       # 15×15 game
+index.html       # Selection screen — pick Mini, Midi, or Maxi
+mini.html        # 5×5 list + game
+midi.html        # 7×7 list + game
+maxi.html        # 15×15 list + game
+daily.html       # Redirect stub → maxi.html (keeps old bookmarks)
 editor.html      # Puzzle editor (all sizes + .puz import)
 puzzles-mini.js  # Mini puzzle library
 puzzles-midi.js  # Midi puzzle library
-puzzles-daily.js # Daily puzzle library (populate via editor)
+puzzles-maxi.js  # Maxi puzzle library (expand via editor)
 ```
 
 ---
