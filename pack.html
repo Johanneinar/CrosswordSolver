@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Croosly — Themed Pack</title>
-  <meta name="description" content="A themed crossword pack on Croosly — a curated set of puzzles around a single topic.">
+  <title>Themed Crossword Pack — Free Puzzles | Croosly</title>
+  <meta name="description" content="A themed crossword pack on Croosly — a curated set of free online puzzles built around a single topic.">
   <link rel="canonical" href="https://croosly.com/pack.html">
   <meta name="theme-color" content="#1a1a1a">
 
@@ -15,16 +15,16 @@
 
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Croosly">
-  <meta property="og:title" content="Croosly — Themed Pack">
-  <meta property="og:description" content="A themed crossword pack on Croosly — a curated set of puzzles around a single topic.">
+  <meta property="og:title" content="Themed Crossword Pack — Free Puzzles | Croosly">
+  <meta property="og:description" content="A themed crossword pack on Croosly — a curated set of free online puzzles built around a single topic.">
   <meta property="og:url" content="https://croosly.com/pack.html">
   <meta property="og:image" content="https://croosly.com/og-image.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
 
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Croosly — Themed Pack">
-  <meta name="twitter:description" content="A themed crossword pack on Croosly — a curated set of puzzles around a single topic.">
+  <meta name="twitter:title" content="Themed Crossword Pack — Free Puzzles | Croosly">
+  <meta name="twitter:description" content="A themed crossword pack on Croosly — a curated set of free online puzzles built around a single topic.">
   <meta name="twitter:image" content="https://croosly.com/og-image.png">
 
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -136,6 +136,11 @@
       }
 
       const statsKey = 'croosly-pack-' + id + '-stats';
+
+      const canonicalLink = document.querySelector('link[rel="canonical"]');
+      if (canonicalLink) {
+        canonicalLink.setAttribute('href', 'https://croosly.com/pack.html?id=' + encodeURIComponent(id));
+      }
 
       loadScript(meta.file).then(function () {
         const pack = window[meta.global];
