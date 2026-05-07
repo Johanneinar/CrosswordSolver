@@ -93,7 +93,7 @@ const PUZZLES = [
     clues: {
       across: [
         { number:1, row:0, col:0, len:7, clue:'Surpasses in spending' },
-        { number:5, row:2, col:0, len:7, clue:'Like a Dalí painting' },
+        { number:5, row:2, col:0, len:7, clue:'Dreamlike and bizarre' },
         { number:6, row:4, col:0, len:7, clue:'Lift up' },
         { number:7, row:6, col:0, len:7, clue:'Simplest of all' },
       ],
@@ -143,7 +143,7 @@ const PUZZLES = [
     clues: {
       across: [
         { number:1, row:0, col:0, len:7, clue:'Keep going' },
-        { number:5, row:2, col:0, len:7, clue:'Cock-a-doodle-doer' },
+        { number:5, row:2, col:0, len:7, clue:'Henhouse alpha' },
         { number:6, row:4, col:0, len:7, clue:'Not for public eyes' },
         { number:7, row:6, col:0, len:7, clue:'Justly' },
       ],

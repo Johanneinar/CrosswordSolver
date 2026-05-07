@@ -136,7 +136,7 @@ const PUZZLES = [
     clues: {
       across: [
         { number:1, row:0, col:0, len:5, clue:'Courageous' },
-        { number:4, row:2, col:0, len:5, clue:'App symbols' },
+        { number:4, row:2, col:0, len:5, clue:'Home-screen tappables' },
         { number:5, row:4, col:0, len:5, clue:'Fashion sense' },
       ],
       down: [
